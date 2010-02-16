@@ -173,6 +173,7 @@ main(void)
     else if (strcmp(buf, "lottery_test\n") == 0)
      { 
      	 printf(2, "Starting lottery test.\n");
+     	 //this is a test
      	 lottery_test(1);
      	 lottery_test(100);
     	 lottery_test(50);
@@ -543,10 +544,10 @@ void lottery_test(int tickets){
 		
 		int temp = 0;
 		int dummy;
-		while(temp < 100000000)
+		while(temp < 10000000)
 		{
 			temp = temp + 1;
-			if(temp == 100000000)
+			if(temp == 10000000)
 					printf(2, "%d tickets, %d ticks\n", tickets, tick() - start_ticks);
 		}
 

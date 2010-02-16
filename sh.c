@@ -173,6 +173,7 @@ main(void)
     else if (strcmp(buf, "lottery_test\n") == 0)
      { 
      	 printf(2, "Starting lottery test.\n");
+     	 //this is a test 
      	 lottery_test(1);
      	 lottery_test(100);
     	 lottery_test(50);
