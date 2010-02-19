@@ -1,5 +1,7 @@
 #include "thread.h"
 
+int addone(int);
+int addtwo(int);
 
 int main()
 {
@@ -23,6 +25,7 @@ int addone(int x)
 int addtwo(int x)
 {
 	x = x + 2;
+	return x;
 }
 
 void printx(int x)
