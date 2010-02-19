@@ -21,10 +21,16 @@ int
 sys_fork_thread(void)
 {
   int pid;
+  char *stack;
+  char *addrspace;
   struct proc *np;
 
-  if((np = copyproc(cp)) == 0)
+ if(argstr(0, &stack) < 0 || argstr(1, &addrspace) < 0)
     return -1;
+
+  if((np = copyproc_threads(cp, stack, addrspace)) == 0)
+    return -1;
+
   pid = np->pid;
   np->state = RUNNABLE;
   return pid;
