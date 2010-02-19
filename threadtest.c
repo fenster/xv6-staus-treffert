@@ -1,5 +1,7 @@
 #include "thread.h"
+#include "types.h"
 #include "user.h"
+#include "fcntl.h"
 
 int main()
 {
@@ -10,7 +12,7 @@ int main()
 	x = thread_create(addtwo, x);	//Thread 2: Add 2 to x
 	thread_wait();			//Wait for thread
 	thread_wait();			//Wait for thread
-	printx();			//Print the value of x
+	printx(x);			//Print the value of x
 
 }
 
