@@ -27,7 +27,7 @@ sys_fork_tickets(void)
   if(argint(0, &numTix) < 0)
     return -1;
 
-  if((np = copyproc(cp, numTix)) == 0)
+  if((np = copyproc_tix(cp, numTix)) == 0)
     return -1;
   pid = np->pid;
   np->state = RUNNABLE;
