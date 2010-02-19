@@ -18,6 +18,25 @@ sys_fork(void)
 }
 
 int
+sys_fork_thread(void)
+{
+  int pid;
+  char *stack;
+  char *addrspace;
+  struct proc *np;
+
+ if(argstr(0, &stack) < 0)
+    return -1;
+
+  if((np = copyproc_threads(cp, stack)) == 0)
+    return -1;
+
+  np->state = RUNNABLE;
+  
+  return pid;
+}
+
+int
 sys_fork_tickets(void)
 {
   int pid;

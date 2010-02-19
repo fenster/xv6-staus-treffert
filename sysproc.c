@@ -31,8 +31,8 @@ sys_fork_thread(void)
   if((np = copyproc_threads(cp, stack)) == 0)
     return -1;
 
-  pid = np->pid;
   np->state = RUNNABLE;
+  
   return pid;
 }
 
@@ -59,6 +59,12 @@ sys_exit(void)
 {
   exit();
   return 0;  // not reached
+}
+
+int
+sys_wait_thread(void)
+{
+  return wait_thread();
 }
 
 int

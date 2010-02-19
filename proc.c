@@ -6,6 +6,7 @@
 #include "proc.h"
 #include "spinlock.h"
 
+
 #define DEFAULT_NUM_TIX 75;
 
 struct spinlock proc_table_lock;
@@ -161,7 +162,7 @@ copyproc_threads(struct proc *p, void *stack)
   // Allocate process.
   if((np = allocproc()) == 0)
     return 0;
-
+	np->kstack = (char *)stack;
 
   np->tf = (struct trapframe*)(np->kstack + KSTACKSIZE) - 1;
 
@@ -183,10 +184,12 @@ copyproc_threads(struct proc *p, void *stack)
   // Set up new context to start executing at forkret (see below).
   memset(&np->context, 0, sizeof(np->context));
   np->context.eip = (uint)forkret;
-  np->context.esp = (uint)stack;
+  np->context.esp = (uint)np->tf;
 
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
+  
+  cprintf("Parent PID: %d PID: %d\n", p->pid, np->pid);
   return np;
 }
 
@@ -566,6 +569,48 @@ wait(void)
           // Found one.
           kfree(p->mem, p->sz);
           kfree(p->kstack, KSTACKSIZE);
+          pid = p->pid;
+          p->state = UNUSED;
+          p->pid = 0;
+          p->parent = 0;
+          p->name[0] = 0;
+          release(&proc_table_lock);
+          return pid;
+        }
+        havekids = 1;
+      }
+    }
+
+    // No point waiting if we don't have any children.
+    if(!havekids || cp->killed){
+      release(&proc_table_lock);
+      return -1;
+    }
+
+    // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+    sleep(cp, &proc_table_lock);
+  }
+}
+
+// Wait for a child process to exit and return its pid.
+// Return -1 if this process has no children.
+int
+wait_thread(void)
+{
+  struct proc *p;
+  int i, havekids, pid;
+
+  acquire(&proc_table_lock);
+  for(;;){
+    // Scan through table looking for zombie children.
+    havekids = 0;
+    for(i = 0; i < NPROC; i++){
+      p = &proc[i];
+      if(p->state == UNUSED)
+        continue;
+      if(p->parent == cp){
+        if(p->state == ZOMBIE){
+          // Found one.
           pid = p->pid;
           p->state = UNUSED;
           p->pid = 0;

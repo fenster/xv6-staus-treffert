@@ -22,3 +22,4 @@
 #define SYS_tick   		21
 #define SYS_fork_tickets	22
 #define SYS_fork_thread 23
+#define SYS_wait_thread 24

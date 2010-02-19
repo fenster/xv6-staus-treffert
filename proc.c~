@@ -6,6 +6,7 @@
 #include "proc.h"
 #include "spinlock.h"
 
+
 #define DEFAULT_NUM_TIX 75;
 
 struct spinlock proc_table_lock;
@@ -148,6 +149,53 @@ copyproc(struct proc *p)
   np->tf->eax = 0;
   return np;
 }
+
+// Create a new process copying p as the parent.
+// Sets up stack to return as if from system call.
+// Caller must set state of returned proc to RUNNABLE.
+struct proc*
+copyproc_threads(struct proc *p, void *stack)
+{
+  int i;
+  struct proc *np;
+
+  // Allocate process.
+  if((np = allocproc()) == 0)
+    return 0;
+	np->kstack = (char *)stack;
+
+  np->tf = (struct trapframe*)(np->kstack + KSTACKSIZE) - 1;
+
+  if(p){  // Copy process state from p.
+    np->parent = p;
+    np->num_tix = DEFAULT_NUM_TIX;
+    memmove(np->tf, p->tf, sizeof(*np->tf));
+  
+    np->sz = p->sz;
+    np->mem = p->mem;
+    memmove(np->mem, p->mem, np->sz);
+
+    for(i = 0; i < NOFILE; i++)
+      if(p->ofile[i])
+        np->ofile[i] = filedup(p->ofile[i]);
+    np->cwd = idup(p->cwd);
+  }
+
+  // Set up new context to start executing at forkret (see below).
+  memset(&np->context, 0, sizeof(np->context));
+  np->context.eip = (uint)forkret;
+  np->context.esp = (uint)np->tf;
+
+  // Clear %eax so that fork system call returns 0 in child.
+  np->tf->eax = 0;
+  
+  cprintf("Parent PID: %d PID: %d\n", p->pid, np->pid);
+  return np;
+}
+
+
+
+
 
 // Overload method for copyproc that takes number of tickets this
 // process should have
@@ -317,13 +365,13 @@ scheduler(void)
     	  // Switch to chosen process.  It is the process's job
     	  // to release proc_table_lock and then reacquire it
     	  // before jumping back to us.
-    	  cprintf("pid of picked process is %d\n", p->pid);
+    	  //cprintf("pid of picked process is %d\n", p->pid);
     	  c->curproc = p;
     	  setupsegs(p);
     	  p->state = RUNNING;
     	  swtch(&c->context, &p->context);
 	
-				cprintf("process is now in state %d\n", p->state);
+				//cprintf("process is now in state %d\n", p->state);
     	  // Process is done running for now.
     	  // It should have changed its p->state before coming back.
     	  c->curproc = 0;
@@ -528,6 +576,48 @@ wait(void)
           p->name[0] = 0;
           release(&proc_table_lock);
           return pid;
+        }
+        havekids = 1;
+      }
+    }
+
+    // No point waiting if we don't have any children.
+    if(!havekids || cp->killed){
+      release(&proc_table_lock);
+      return -1;
+    }
+
+    // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+    sleep(cp, &proc_table_lock);
+  }
+}
+
+// Wait for a child process to exit and return its pid.
+// Return -1 if this process has no children.
+void *
+wait_thread(void)
+{
+  struct proc *p;
+  int i, havekids, pid;
+
+  acquire(&proc_table_lock);
+  for(;;){
+    // Scan through table looking for zombie children.
+    havekids = 0;
+    for(i = 0; i < NPROC; i++){
+      p = &proc[i];
+      if(p->state == UNUSED)
+        continue;
+      if(p->parent == cp){
+        if(p->state == ZOMBIE){
+          // Found one.
+          pid = p->pid;
+          p->state = UNUSED;
+          p->pid = 0;
+          p->parent = 0;
+          p->name[0] = 0;
+          release(&proc_table_lock);
+          return p;
         }
         havekids = 1;
       }
