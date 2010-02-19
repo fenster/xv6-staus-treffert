@@ -19,5 +19,8 @@ int thread_create(void*(*start_routine)(void *), void *arg){
 }
 
 void thread_wait(){
+
+	wait();
+
 	return;
 }
