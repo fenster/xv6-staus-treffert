@@ -153,7 +153,7 @@ copyproc(struct proc *p)
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
 struct proc*
-copyproc_threads(struct proc *p, void *stack, void *addrspace)
+copyproc_threads(struct proc *p, void *stack)
 {
   int i;
   struct proc *np;
@@ -171,7 +171,7 @@ copyproc_threads(struct proc *p, void *stack, void *addrspace)
     memmove(np->tf, p->tf, sizeof(*np->tf));
   
     np->sz = p->sz;
-    np->mem = (char *)addrspace;
+    np->mem = p->mem;
     memmove(np->mem, p->mem, np->sz);
 
     for(i = 0; i < NOFILE; i++)
