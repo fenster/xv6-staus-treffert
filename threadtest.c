@@ -1,7 +1,5 @@
 #include "thread.h"
-#include "types.h"
-#include "user.h"
-#include "fcntl.h"
+
 
 int main()
 {
@@ -29,5 +27,5 @@ int addtwo(int x)
 
 void printx(int x)
 {
-	printf(2, "x = %d\n", x);
+	//printf(2, "x = %d\n", x);
 }
