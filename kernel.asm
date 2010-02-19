@@ -6406,7 +6406,7 @@ copyproc_threads(struct proc *p, int stack, int routine, int args)
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
   
-  np->tf->esp = (stack + 1024 - 8);
+  np->tf->esp = (stack + 1024 - 12);
   10401d:	8b 55 0c             	mov    0xc(%ebp),%edx
   }
 
@@ -6426,7 +6426,7 @@ copyproc_threads(struct proc *p, int stack, int routine, int args)
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
   
-  np->tf->esp = (stack + 1024 - 8);
+  np->tf->esp = (stack + 1024 - 12);
   *(int *)(np->tf->esp + np->mem) = routine;
   10402d:	8b 4d 10             	mov    0x10(%ebp),%ecx
   104030:	8b 5d 0c             	mov    0xc(%ebp),%ebx
@@ -6435,8 +6435,8 @@ copyproc_threads(struct proc *p, int stack, int routine, int args)
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
   
-  np->tf->esp = (stack + 1024 - 8);
-  104033:	81 c2 f8 03 00 00    	add    $0x3f8,%edx
+  np->tf->esp = (stack + 1024 - 12);
+  104033:	81 c2 f4 03 00 00    	add    $0x3f4,%edx
   }
 
   // Set up new context to start executing at forkret (see below).
@@ -6448,7 +6448,7 @@ copyproc_threads(struct proc *p, int stack, int routine, int args)
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
   
-  np->tf->esp = (stack + 1024 - 8);
+  np->tf->esp = (stack + 1024 - 12);
   10403c:	89 50 3c             	mov    %edx,0x3c(%eax)
   *(int *)(np->tf->esp + np->mem) = routine;
   10403f:	8b 16                	mov    (%esi),%edx
@@ -6460,13 +6460,13 @@ copyproc_threads(struct proc *p, int stack, int routine, int args)
   np->tf->eax = 0;
   104041:	c7 40 1c 00 00 00 00 	movl   $0x0,0x1c(%eax)
   
-  np->tf->esp = (stack + 1024 - 8);
+  np->tf->esp = (stack + 1024 - 12);
   *(int *)(np->tf->esp + np->mem) = routine;
-  104048:	89 8c 1a f8 03 00 00 	mov    %ecx,0x3f8(%edx,%ebx,1)
-  *(int *)(np->tf->esp + np->mem + 4) = args;;
+  104048:	89 8c 1a f4 03 00 00 	mov    %ecx,0x3f4(%edx,%ebx,1)
+  *(int *)(np->tf->esp + np->mem + 8) = args;;
   10404f:	8b 40 3c             	mov    0x3c(%eax),%eax
   104052:	8b 4d 14             	mov    0x14(%ebp),%ecx
-  104055:	89 4c 02 04          	mov    %ecx,0x4(%edx,%eax,1)
+  104055:	89 4c 02 08          	mov    %ecx,0x8(%edx,%eax,1)
   return np;
 }
   104059:	83 c4 1c             	add    $0x1c,%esp

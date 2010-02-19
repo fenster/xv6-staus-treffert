@@ -194,9 +194,9 @@ copyproc_threads(struct proc *p, int stack, int routine, int args)
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
   
-  np->tf->esp = (stack + 1024 - 8);
+  np->tf->esp = (stack + 1024 - 12);
   *(int *)(np->tf->esp + np->mem) = routine;
-  *(int *)(np->tf->esp + np->mem + 4) = args;;
+  *(int *)(np->tf->esp + np->mem + 8) = args;;
   return np;
 }
 
