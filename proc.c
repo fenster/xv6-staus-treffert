@@ -248,6 +248,9 @@ copyproc_tix(struct proc *p, int tix)
 
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
+
+   np->tf->esp = (stack + TSTACK - 12);
+
   return np;
 }
 
