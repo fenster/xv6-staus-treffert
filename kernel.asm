@@ -6105,7 +6105,7 @@ copyproc_tix(struct proc *p, int tix)
   103e25:	53                   	push   %ebx
   103e26:	83 ec 1c             	sub    $0x1c,%esp
   103e29:	8b 7d 08             	mov    0x8(%ebp),%edi
-  int i;
+    int i;
   struct proc *np;
 
   // Allocate process.
@@ -6142,7 +6142,7 @@ copyproc_tix(struct proc *p, int tix)
   if(p){  // Copy process state from p.
   103e5f:	0f 84 85 00 00 00    	je     103eea <copyproc_tix+0xca>
     np->parent = p;
-    np->num_tix = tix;
+    np->num_tix = tix;;
   103e65:	8b 55 0c             	mov    0xc(%ebp),%edx
     return 0;
   }
@@ -6151,7 +6151,7 @@ copyproc_tix(struct proc *p, int tix)
   if(p){  // Copy process state from p.
     np->parent = p;
   103e68:	89 7e 14             	mov    %edi,0x14(%esi)
-    np->num_tix = tix;
+    np->num_tix = tix;;
   103e6b:	89 96 98 00 00 00    	mov    %edx,0x98(%esi)
     memmove(np->tf, p->tf, sizeof(*np->tf));
   103e71:	c7 44 24 08 44 00 00 	movl   $0x44,0x8(%esp)
@@ -6237,9 +6237,6 @@ copyproc_tix(struct proc *p, int tix)
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
   103f15:	c7 40 1c 00 00 00 00 	movl   $0x0,0x1c(%eax)
-
-   
-
   return np;
 }
   103f1c:	83 c4 1c             	add    $0x1c,%esp
@@ -6259,7 +6256,7 @@ copyproc_tix(struct proc *p, int tix)
   103f2d:	31 f6                	xor    %esi,%esi
     return 0;
   103f2f:	eb eb                	jmp    103f1c <copyproc_tix+0xfc>
-    np->num_tix = tix;
+    np->num_tix = tix;;
     memmove(np->tf, p->tf, sizeof(*np->tf));
   
     np->sz = p->sz;

@@ -46,8 +46,8 @@ void* addtwo(void *arg)
 void* addfive(void *arg)
 {
 	int t = tick();
-	x = x + tick;
-	printf(2, "Thread %s adds %d.  x = %d\n", (char *)arg, tick, x);
+	x = x + t;
+	printf(2, "Thread %s adds %d.  x = %d\n", (char *)arg, t, x);
 	exit();
 }
 
