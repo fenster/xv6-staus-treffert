@@ -154,15 +154,20 @@ copyproc(struct proc *p)
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
 struct proc*
-copyproc_threads(struct proc *p, void *stack)
+copyproc_threads(struct proc *p, int stack, int routine, int args)
 {
   int i;
   struct proc *np;
-
   // Allocate process.
-  if((np = allocproc()) == 0)
+  if((np = allocproc()) == 0){
     return 0;
-	np->kstack = (char *)stack;
+	}
+	
+	// Allocate kernel stack.
+  if((np->kstack = kalloc(KSTACKSIZE)) == 0){
+    np->state = UNUSED;
+    return 0;
+  }
 
   np->tf = (struct trapframe*)(np->kstack + KSTACKSIZE) - 1;
 
@@ -173,7 +178,7 @@ copyproc_threads(struct proc *p, void *stack)
   
     np->sz = p->sz;
     np->mem = p->mem;
-    memmove(np->mem, p->mem, np->sz);
+    //memmove(np->mem, p->mem, np->sz);
 
     for(i = 0; i < NOFILE; i++)
       if(p->ofile[i])
@@ -189,7 +194,9 @@ copyproc_threads(struct proc *p, void *stack)
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
   
-  cprintf("Parent PID: %d PID: %d\n", p->pid, np->pid);
+  np->tf->esp = (stack + 1024 - 8);
+  *(int *)(np->tf->esp + np->mem) = routine;
+  *(int *)(np->tf->esp + np->mem + 4) = args;;
   return np;
 }
 
@@ -249,7 +256,7 @@ copyproc_tix(struct proc *p, int tix)
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
 
-   np->tf->esp = (stack + TSTACK - 12);
+   
 
   return np;
 }
@@ -614,6 +621,7 @@ wait_thread(void)
       if(p->parent == cp){
         if(p->state == ZOMBIE){
           // Found one.
+          kfree(p->kstack, KSTACKSIZE);
           pid = p->pid;
           p->state = UNUSED;
           p->pid = 0;

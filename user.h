@@ -23,7 +23,7 @@ char* sbrk(int);
 int sleep(int);
 int tick(void);
 int fork_tickets(int);
-int fork_thread(char*);
+int fork_thread(int, int, int);
 
 
 // ulib.c

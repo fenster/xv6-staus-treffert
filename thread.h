@@ -5,23 +5,19 @@
 int thread_create(void*(*start_routine)(void *), void *arg){
 	
 	//Allocate stack using process heap
-	void * stack = malloc(4096);
+	int stack = malloc(1024);
 
 	//create new thread
-	if(fork_thread(stack) == 0){
-		//if we are in the child, call to routine
-		printf(2, "HERE\n");
-		start_routine(arg);			
+	int pid = fork_thread((int)stack, (int)start_routine, (int)arg);
 			
-	}
 	
-	return 0;
+			
+	return pid;
 }
 
 void thread_wait(){
 	
-	int pid = wait_thread();
-	//free(
-	printf(2, "EXITING PID %d\n", pid);
+	int pid;
+	while(pid = wait_thread() != -1);
 	return;
 }

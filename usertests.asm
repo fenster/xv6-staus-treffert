@@ -1941,8 +1941,8 @@ bigfile(void)
      e43:	0f 88 f4 00 00 00    	js     f3d <bigfile+0x1ad>
     printf(1, "cannot open bigfile\n");
     exit();
-     e49:	31 db                	xor    %ebx,%ebx
-     e4b:	31 f6                	xor    %esi,%esi
+     e49:	31 f6                	xor    %esi,%esi
+     e4b:	31 db                	xor    %ebx,%ebx
      e4d:	eb 2f                	jmp    e7e <bigfile+0xee>
      e4f:	90                   	nop
       printf(1, "read bigfile failed\n");
