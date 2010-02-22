@@ -107,6 +107,7 @@ UPROGS=\
 	_rm\
 	_sh\
 	_threadtest\
+	_threadrace\
 	_usertests\
 	_wc\
 	_zombie\
