@@ -467,6 +467,29 @@ sleep(void *chan, struct spinlock *lk)
   }
 }
 
+//Put the current process to sleep (used by cond_wait)
+void sleep_lock(void)
+{
+  if(cp == 0)
+    panic("sleep")
+  acquire(&proc_table_lock);
+  cp->state = SLEEPING;
+	sched();
+	release(&proc_table_lock); 
+}
+
+//Wake up given process
+void wake_lock(int pid)
+{
+	struct proc *p;
+
+  for(p = proc; p < &proc[NPROC]; p++)
+	{
+		if(p->state == SLEEPING && p->pid == pid)
+			p->state = RUNNABLE;
+	}
+}
+
 // Wake up all processes sleeping on chan.
 // Proc_table_lock must be held.
 static void

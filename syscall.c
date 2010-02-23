@@ -126,6 +126,8 @@ static int (*syscalls[])(void) = {
 [SYS_fork_tickets]   	sys_fork_tickets,
 [SYS_fork_thread]	sys_fork_thread,
 [SYS_wait_thread] sys_wait_thread,
+[SYS_sleep_lock]	sys_sleep_lock,
+[SYS_wake_lock]		sys_wake_lock,
 };
 
 void

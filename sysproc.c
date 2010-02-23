@@ -126,6 +126,26 @@ sys_sleep(void)
 }
 
 int
+sys_sleep_lock(void)
+{
+	sleep_lock();
+	return 0;
+}
+
+int
+sys_wake_lock(void)
+{
+	int pid;
+
+	if(argint(0, &pid) < 0)
+		return -1;
+
+	wake_lock(pid);
+
+	return 0;
+}
+
+int
 sys_tick(void)
 {
 return ticks;
