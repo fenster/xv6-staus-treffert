@@ -4,6 +4,7 @@ void* addone(void *arg);
 
 static volatile int x = 0;
 static volatile int numloops = 0;
+struct mutex_t lock;
 
 /**
 *		Creates a case in which two threads will be racing to write one variable.  Exected
@@ -11,7 +12,7 @@ static volatile int numloops = 0;
 */
 int main(int argc, char *argv[])
 {
-	//Create 2 new threads. 
+	//Create 2 new threads.
 	if(argc != 2){
 		printf(2, "Usage: threadrace <loop count>\n");
 		exit();
@@ -20,6 +21,8 @@ int main(int argc, char *argv[])
 	int pid;
 	char *arg = argv[1];
 	numloops = atoi(arg);
+	//create a lock
+	mutex_init(&lock);
 	printf(2, "Parent creating thread A\n");
 	pid = thread_create(&addone, (void *)"A");	//Thread 1: Add 1 to x
 	printf(2, "Parent creating thread B\n");
@@ -37,10 +40,14 @@ void* addone(void *arg)
 {
 	printf(2, "Thread %s will loop %d times.\n", (char *)arg, numloops);
 	int i;
+  
 	for(i = 0; i < numloops; i++){
+	  mutex_lock(&lock);
 		x = x + 1;
+		mutex_unlock(&lock);
 		//printf(2, "Thread %s adds 1.  x = %d\n", (char *)arg, x);
 	}
+	
 		exit();
 }
 

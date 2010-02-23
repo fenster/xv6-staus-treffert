@@ -9059,7 +9059,7 @@ sys_fork_thread(void)
    }
 
   np->state = RUNNABLE;
-  
+  pid = np->pid;
   return pid;
   1056a6:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
 }
@@ -9108,10 +9108,11 @@ sys_fork_thread(void)
 
   np->state = RUNNABLE;
   105713:	c7 42 0c 03 00 00 00 	movl   $0x3,0xc(%edx)
-  
+  pid = np->pid;
+  10571a:	8b 42 10             	mov    0x10(%edx),%eax
   return pid;
-  10571a:	eb 8f                	jmp    1056ab <sys_fork_thread+0x2b>
-  10571c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  10571d:	eb 8c                	jmp    1056ab <sys_fork_thread+0x2b>
+  10571f:	90                   	nop
 
 00105720 <sys_fork>:
 #include "mmu.h"

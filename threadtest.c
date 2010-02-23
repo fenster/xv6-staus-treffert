@@ -14,9 +14,9 @@ int main()
 	printf(2, "Parent creating thread A\n");
 	pid = thread_create(&addone, (void *)"A");	//Thread 1: Add 1 to x
 	thread_wait();			//Wait for thread
-	printf(2, "Parent creating thread B\n");
+	printf(2, "Parent creating thread B with pid %d\n", pid);
 	pid = thread_create(&addone, (void *)"B");	//Thread 1: Add 1 to x
-	printf(2, "Parent creating thread C\n");
+	printf(2, "Parent creating thread C with pid %d\n", pid);
 	pid = thread_create(&addtwo, (void *)"C");	//Thread 2: Add 2 to x
 	thread_wait();			//Wait for thread
 	thread_wait();

@@ -31,7 +31,6 @@ sys_fork_thread(void)
     return -1;
 
   if((np = copyproc_threads(cp, (int)stack, (int)routine, (int)args)) == 0){
-  	cprintf("np is %d\n", np);
     return -2;
    }
 

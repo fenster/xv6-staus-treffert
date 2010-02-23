@@ -902,8 +902,8 @@ gets(char *buf, int max)
  48f:	c3                   	ret    
 
 00000490 <putc>:
-#include "stat.h"
-#include "user.h"
+
+//struct mutex_t plock;
 
 static void
 putc(int fd, char c)
@@ -1186,11 +1186,11 @@ printf(int fd, char *fmt, ...)
  5f9:	75 95                	jne    590 <printf+0x40>
  5fb:	90                   	nop
  5fc:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-        putc(fd, c);
       }
       state = 0;
     }
   }
+ // mutex_unlock(&plock);
 }
  600:	83 c4 2c             	add    $0x2c,%esp
  603:	5b                   	pop    %ebx
