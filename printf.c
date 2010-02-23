@@ -1,6 +1,9 @@
+//#include "thread.h"
 #include "types.h"
 #include "stat.h"
 #include "user.h"
+
+//struct mutex_t plock;
 
 static void
 putc(int fd, char c)
@@ -39,6 +42,7 @@ printint(int fd, int xx, int base, int sgn)
 void
 printf(int fd, char *fmt, ...)
 {
+	//mutex_lock(&plock);
   char *s;
   int c, i, state;
   uint *ap;
@@ -82,4 +86,5 @@ printf(int fd, char *fmt, ...)
       state = 0;
     }
   }
+ // mutex_unlock(&plock);
 }

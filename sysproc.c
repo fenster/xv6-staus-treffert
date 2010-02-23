@@ -35,7 +35,7 @@ sys_fork_thread(void)
    }
 
   np->state = RUNNABLE;
-  
+  pid = np->pid;
   return pid;
 }
 
