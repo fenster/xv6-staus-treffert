@@ -213,7 +213,7 @@ copyproc_threads(struct proc *p, int stack, int routine, int args)
 struct proc*
 copyproc_tix(struct proc *p, int tix)
 {
-  int i;
+    int i;
   struct proc *np;
 
   // Allocate process.
@@ -229,7 +229,7 @@ copyproc_tix(struct proc *p, int tix)
 
   if(p){  // Copy process state from p.
     np->parent = p;
-    np->num_tix = tix;
+    np->num_tix = tix;;
     memmove(np->tf, p->tf, sizeof(*np->tf));
   
     np->sz = p->sz;
@@ -255,9 +255,6 @@ copyproc_tix(struct proc *p, int tix)
 
   // Clear %eax so that fork system call returns 0 in child.
   np->tf->eax = 0;
-
-   
-
   return np;
 }
 
@@ -468,6 +465,29 @@ sleep(void *chan, struct spinlock *lk)
     release(&proc_table_lock);
     acquire(lk);
   }
+}
+
+//Put the current process to sleep (used by cond_wait)
+void sleep_lock(void)
+{
+  if(cp == 0)
+    panic("sleep")
+  acquire(&proc_table_lock);
+  cp->state = SLEEPING;
+	sched();
+	release(&proc_table_lock); 
+}
+
+//Wake up given process
+void wake_lock(int pid)
+{
+	struct proc *p;
+
+  for(p = proc; p < &proc[NPROC]; p++)
+	{
+		if(p->state == SLEEPING && p->pid == pid)
+			p->state = RUNNABLE;
+	}
 }
 
 // Wake up all processes sleeping on chan.

@@ -21,5 +21,8 @@
 #define SYS_sleep  		20
 #define SYS_tick   		21
 #define SYS_fork_tickets	22
-#define SYS_fork_thread 23
-#define SYS_wait_thread 24
+#define SYS_sleep_lock 23
+#define SYS_wake_lock 24
+#define SYS_fork_thread 25
+#define SYS_wait_thread 26
+

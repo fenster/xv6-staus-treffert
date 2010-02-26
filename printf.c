@@ -1,7 +1,7 @@
-//#include "thread.h"
 #include "types.h"
 #include "stat.h"
 #include "user.h"
+//#include "thread.h"
 
 //struct mutex_t plock;
 
@@ -86,5 +86,5 @@ printf(int fd, char *fmt, ...)
       state = 0;
     }
   }
- // mutex_unlock(&plock);
+  //mutex_unlock(&plock);
 }

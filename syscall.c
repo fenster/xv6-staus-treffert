@@ -100,6 +100,8 @@ extern int sys_tick(void);
 extern int sys_fork_tickets(void);
 extern int sys_fork_thread(void);
 extern int sys_wait_thread(void);
+extern int sys_sleep_lock(void);
+extern int sys_wake_lock(void);
 
 static int (*syscalls[])(void) = {
 [SYS_chdir]   		sys_chdir,

@@ -24,6 +24,8 @@ int sleep(int);
 int tick(void);
 int fork_tickets(int);
 int fork_thread(int, int, int);
+int sleep_lock(void);
+int wake_lock(int);
 
 
 // ulib.c
@@ -40,13 +42,17 @@ void* malloc(uint);
 void free(void*);
 int atoi(const char*);
 
-//thread.h
 struct mutex_t{
 		uint flag;
 };
 
-int thread_create(void*(*start_routine)(void *), void *arg);
-void thread_wait();
-void mutex_lock(struct mutex_t *m);
-void mutex_unlock(struct mutex_t *m);
-void mutex_init(struct mutex_t *m);
+struct node{
+		int pid;
+		struct mutex_t *lock;
+		struct node *next;
+};
+
+struct cond_t{
+		int size;
+		struct node *head;	
+};

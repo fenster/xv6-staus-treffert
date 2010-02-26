@@ -471,7 +471,7 @@ sleep(void *chan, struct spinlock *lk)
 void sleep_lock(void)
 {
   if(cp == 0)
-    panic("sleep")
+    panic("sleep");
   acquire(&proc_table_lock);
   cp->state = SLEEPING;
 	sched();
