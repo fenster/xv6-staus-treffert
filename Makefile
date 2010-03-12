@@ -96,6 +96,7 @@ mkfs: mkfs.c fs.h
 
 UPROGS=\
 	_cat\
+	_checktest\
 	_condtest\
 	_echo\
 	_forktest\

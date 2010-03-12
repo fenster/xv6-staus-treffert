@@ -26,6 +26,7 @@ int fork_tickets(int);
 int fork_thread(int, int, int);
 int sleep_lock(void);
 int wake_lock(int);
+int check(int fd, int offset);
 
 
 // ulib.c

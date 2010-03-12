@@ -424,6 +424,17 @@ readi(struct inode *ip, char *dst, uint off, uint n)
   return n;
 }
 
+// Check data from inode to see if it is in the buffer cache.
+int
+checki(struct inode *ip, int off)
+{
+	if(off > ip->size)
+		return -1;
+	//cprintf("checki: calling bcheck\n");
+    return bcheck(ip->dev, bmap(ip, off/BSIZE, 0));
+
+ }
+
 // Write data to inode.
 int
 writei(struct inode *ip, char *src, uint off, uint n)

@@ -1,8 +1,9 @@
+#include "types.h"
+#include "stat.h"
+#include "user.h"
 #include "thread.h"
 
 #define MAX 10
-
-void* addone(void *arg);
 
 static volatile int x = 0;
 static volatile int loops = 0;

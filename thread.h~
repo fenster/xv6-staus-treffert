@@ -1,6 +1,6 @@
-#include "types.h"
-#include "stat.h"
-#include "user.h"
+#ifndef __thread_h__
+#define __thread_h__
+
 #include "x86.h"
 
 
@@ -96,12 +96,12 @@ void cond_signal(struct cond_t *c){
 	//wake a thread
 	c->size = c->size - 1;
 	//mutex_lock(n->lock);
-		printf(2, "here\n");
 	wake_lock(n->pid);
-	printf(2, "here2\n");
 }
 
 void cond_init(struct cond_t *c){
 		c->size = 0;
 		c->head = 0;
 }
+
+#endif

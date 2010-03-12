@@ -25,4 +25,5 @@
 #define SYS_wake_lock 24
 #define SYS_fork_thread 25
 #define SYS_wait_thread 26
+#define SYS_check		27
 

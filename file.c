@@ -105,6 +105,24 @@ fileread(struct file *f, char *addr, int n)
   panic("fileread");
 }
 
+// Check if file exists in cache buffer.
+int
+filecheck(struct file *f, int offset)
+{
+  int r;
+
+  if(f->readable == 0)
+    return -1;
+  if(f->type == FD_INODE){
+    ilock(f->ip);
+    //cprintf("calling checki\n");
+    r = checki(f->ip, offset);
+    iunlock(f->ip);
+    return r;
+  }
+  panic("filecheck");
+}
+
 // Write to file f.  Addr is kernel address.
 int
 filewrite(struct file *f, char *addr, int n)

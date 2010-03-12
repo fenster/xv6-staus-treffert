@@ -1,3 +1,6 @@
+#include "types.h"
+#include "stat.h"
+#include "user.h"
 #include "thread.h"
 
 void* addone(void *arg);

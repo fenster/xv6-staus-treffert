@@ -53,6 +53,24 @@ binit(void)
   }
 }
 
+int
+bcheck(uint dev, uint sector){
+	 struct buf *b;
+
+	 acquire(&buf_table_lock);
+
+	  // Try for cached block.
+	  for(b = bufhead.next; b != &bufhead; b = b->next){
+	    if((b->flags & (B_BUSY|B_VALID)) &&
+	       b->dev == dev && b->sector == sector){
+	      release(&buf_table_lock);
+	      return 1;
+	    }
+	  }
+      release(&buf_table_lock);
+	  return 0;
+
+}
 // Look through buffer cache for sector on device dev.
 // If not found, allocate fresh block.
 // In either case, return locked buffer.
