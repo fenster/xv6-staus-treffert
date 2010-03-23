@@ -35,7 +35,7 @@
 00000000000i[MEM0 ] rom at 0xfffe0000/131072 ('/usr/local/share/bochs/BIOS-bochs-latest')
 00000000000i[MEM0 ] rom at 0xc0000/40448 ('/usr/local/share/bochs/VGABIOS-lgpl-latest')
 00000000000i[CMOS ] Using local time for initial clock
-00000000000i[CMOS ] Setting initial clock to: Thu Mar 11 20:48:44 2010 (time0=1268362124)
+00000000000i[CMOS ] Setting initial clock to: Mon Mar 22 20:47:33 2010 (time0=1269308853)
 00000000000i[DMA  ] channel 4 used by cascade
 00000000000i[DMA  ] channel 2 used by Floppy Drive
 00000000000i[FDD  ] tried to open '/dev/fd0' read/write: No such file or directory
@@ -56,7 +56,7 @@
 00000000000i[HD   ] HD on ata0-0: 'xv6.img' 'flat' mode 
 00000000000i[HD   ] HD on ata0-1: 'fs.img' 'flat' mode 
 00000000000i[HD   ] translation on ata0-0 set to 'none'
-00000000000i[HD   ] translation on ata0-1 set to 'none'
+00000000000i[HD   ] translation on ata0-1 set to 'large'
 00000000000i[HD   ] Using boot sequence disk, none, none
 00000000000i[HD   ] Floppy boot signature check is enabled
 00000000000i[     ] init_dev of 'serial' plugin device by virtual method
@@ -94,8 +94,8 @@
 00000794626i[BIOS ] MP table addr=0x000fbb70 MPC table addr=0x000fbaa0 size=0xd0
 00000796470i[BIOS ] SMBIOS table addr=0x000fbb80
 00000797353i[BIOS ] bios_table_cur_addr: 0x000fbc84
-00000809872i[BIOS ] ata0-0: PCHS=100/10/10 translation=none LCHS=100/10/10
-00000868023i[BIOS ] ata0-1: PCHS=1024/1/1 translation=none LCHS=1024/1/1
+00000809950i[BIOS ] ata0-0: PCHS=100/10/10 translation=none LCHS=100/10/10
+00000868208i[BIOS ] ata0-1: PCHS=4096/1/1 translation=large LCHS=1024/4/1
 00003000000i[WX   ] dimension update x=720 y=400 fontheight=16 fontwidth=9 bpp=8
 00030787405i[BIOS ] Booting from 0000:7c00
-02678564774p[     ] >>PANIC<< SIGNAL 2 caught
+03708612734p[     ] >>PANIC<< SIGNAL 2 caught

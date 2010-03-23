@@ -95,6 +95,7 @@ mkfs: mkfs.c fs.h
 	gcc $(CFLAGS) -Wall -o mkfs mkfs.c
 
 UPROGS=\
+	_bigfstest\
 	_cat\
 	_checktest\
 	_condtest\

@@ -331,7 +331,11 @@ bmap(struct inode *ip, uint bn, int alloc)
   }
   bn -= NDIRECT;
 
+  //check indirect
   if(bn < NINDIRECT){
+
+	  cprintf("here!\n");
+
     // Load indirect block, allocating if necessary.
     if((addr = ip->addrs[INDIRECT]) == 0){
       if(!alloc)
@@ -353,6 +357,51 @@ bmap(struct inode *ip, uint bn, int alloc)
     return addr;
   }
 
+  //NEW CODE
+  //decrement block number for new reference
+  bn -= NINDIRECT;
+
+  //DOUBLE INDIRECT
+  if(bn < NDINDIRECT){
+
+	  cprintf("here!\n");
+	  if((addr = ip->addrs[DINDIRECT]) == 0){
+	     if(!alloc)
+	        return -1;
+	     ip->addrs[NINDIRECT] = addr = balloc(ip->dev);
+	  }
+	  bp = bread(ip->dev, addr);
+	  a = (uint*)bp->data;
+
+	  //calculate base and offset indirect block in double indirect block
+	  uint base = bn / NINDIRECT;
+	  uint offset = bn % NINDIRECT;
+
+	  //grab indirect block and allocate if necessary
+	  if((addr = a[base]) == 0){
+	        if(!alloc){
+	          brelse(bp);
+	          return -1;
+	        }
+	        a[base] = addr = balloc(ip->dev);
+	  }
+	  bp = bread(ip->dev, addr);
+	  a = bp->data;
+
+	  //get data block from indirect block
+	  if((addr = a[offset]) == 0){
+	        if(!alloc){
+	          brelse(bp);
+	          return -1;
+	        }
+	        a[offset] = addr = balloc(ip->dev);
+	        bwrite(bp);
+	  }
+	  brelse(bp);
+	  return addr;
+
+  }
+
   panic("bmap: out of range");
 }
 
@@ -360,8 +409,8 @@ bmap(struct inode *ip, uint bn, int alloc)
 static void
 itrunc(struct inode *ip)
 {
-  int i, j;
-  struct buf *bp;
+  int i, j, k;
+  struct buf *bp, *bp2;
   uint *a;
 
   for(i = 0; i < NDIRECT; i++){
@@ -380,6 +429,27 @@ itrunc(struct inode *ip)
     }
     brelse(bp);
     ip->addrs[INDIRECT] = 0;
+  }
+
+  //free double indirect blocks -- NEW CODE
+  if(ip->addrs[DINDIRECT]){
+	  bp = bread(ip->dev, ip->addrs[DINDIRECT]);
+	      a = (uint*)bp->data;
+	      for(j = 0; j < NINDIRECT; j++){
+	        if(a[j]){
+	          bp2 = bread(ip->dev, a[j]);
+	          uint* b = (uint*)bp2->data;
+	          for(k = 0; k < NINDIRECT; k++){
+	        	  if(b[k]){
+	        		  bfree(ip->dev, b[k]);
+	        	  }
+
+	          }
+	          bfree(ip->dev, a[j]);
+	        }
+	      }
+	      brelse(bp);
+	      ip->addrs[DINDIRECT] = 0;
   }
 
   ip->size = 0;
