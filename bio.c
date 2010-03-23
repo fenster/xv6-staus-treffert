@@ -105,7 +105,6 @@ bget(uint dev, uint sector)
       release(&buf_table_lock);
       return b;
     }
-    cprintf("here2\n");
   }
   panic("bget: no buffers");
 }

@@ -72,7 +72,7 @@ balloc(uint dev)
       }
     }
     brelse(bp);
-    cprintf("b = %d", b);
+    //cprintf("b = %d", b);
   }
   panic("balloc: out of blocks");
 }
@@ -339,6 +339,7 @@ bmap(struct inode *ip, uint bn, int alloc)
     if((addr = ip->addrs[INDIRECT]) == 0){
       if(!alloc)
         return -1;
+      //cprintf("allocating indirect block %d in indirect\n", bn);
       ip->addrs[INDIRECT] = addr = balloc(ip->dev);
     }
     bp = bread(ip->dev, addr);
@@ -349,7 +350,7 @@ bmap(struct inode *ip, uint bn, int alloc)
         brelse(bp);
         return -1;
       }
-      cprintf("allocating block %d in indirect\n", bn);
+      //cprintf("allocating data block %d in indirect\n", bn);
       a[bn] = addr = balloc(ip->dev);
       bwrite(bp);
     }
@@ -361,6 +362,7 @@ bmap(struct inode *ip, uint bn, int alloc)
   //decrement block number for new reference
   bn -= NINDIRECT;
 
+
   //DOUBLE INDIRECT
   if(bn < NDINDIRECT){
 
@@ -369,7 +371,7 @@ bmap(struct inode *ip, uint bn, int alloc)
 	  if((addr = ip->addrs[DINDIRECT]) == 0){
 	     if(!alloc)
 	        return -1;
-	     ip->addrs[NINDIRECT] = addr = balloc(ip->dev);
+	     ip->addrs[DINDIRECT] = addr = balloc(ip->dev);
 	  }
 	  bp = bread(ip->dev, addr);
 	  a = (uint*)bp->data;
