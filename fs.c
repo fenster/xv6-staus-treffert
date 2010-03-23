@@ -72,6 +72,7 @@ balloc(uint dev)
       }
     }
     brelse(bp);
+    cprintf("b = %d", b);
   }
   panic("balloc: out of blocks");
 }
@@ -334,8 +335,6 @@ bmap(struct inode *ip, uint bn, int alloc)
   //check indirect
   if(bn < NINDIRECT){
 
-	  cprintf("here!\n");
-
     // Load indirect block, allocating if necessary.
     if((addr = ip->addrs[INDIRECT]) == 0){
       if(!alloc)
@@ -350,6 +349,7 @@ bmap(struct inode *ip, uint bn, int alloc)
         brelse(bp);
         return -1;
       }
+      cprintf("allocating block %d in indirect\n", bn);
       a[bn] = addr = balloc(ip->dev);
       bwrite(bp);
     }
@@ -364,7 +364,8 @@ bmap(struct inode *ip, uint bn, int alloc)
   //DOUBLE INDIRECT
   if(bn < NDINDIRECT){
 
-	  cprintf("here!\n");
+	  //cprintf("bn is %d\n", bn);
+
 	  if((addr = ip->addrs[DINDIRECT]) == 0){
 	     if(!alloc)
 	        return -1;
@@ -383,10 +384,14 @@ bmap(struct inode *ip, uint bn, int alloc)
 	          brelse(bp);
 	          return -1;
 	        }
+	        //cprintf("allocating new indirect block for bn = %d\n", bn);
 	        a[base] = addr = balloc(ip->dev);
+	        bwrite(bp);
 	  }
+
+	  brelse(bp);
 	  bp = bread(ip->dev, addr);
-	  a = bp->data;
+	  a = (uint*)bp->data;
 
 	  //get data block from indirect block
 	  if((addr = a[offset]) == 0){
@@ -394,6 +399,7 @@ bmap(struct inode *ip, uint bn, int alloc)
 	          brelse(bp);
 	          return -1;
 	        }
+	        //cprintf("allocating new data block with bn = %d\n", bn);
 	        a[offset] = addr = balloc(ip->dev);
 	        bwrite(bp);
 	  }
