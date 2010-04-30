@@ -35,7 +35,7 @@
 00000000000i[MEM0 ] rom at 0xfffe0000/131072 ('/usr/local/share/bochs/BIOS-bochs-latest')
 00000000000i[MEM0 ] rom at 0xc0000/40448 ('/usr/local/share/bochs/VGABIOS-lgpl-latest')
 00000000000i[CMOS ] Using local time for initial clock
-00000000000i[CMOS ] Setting initial clock to: Fri Apr 30 00:07:36 2010 (time0=1272604056)
+00000000000i[CMOS ] Setting initial clock to: Fri Apr 30 01:07:08 2010 (time0=1272607628)
 00000000000i[DMA  ] channel 4 used by cascade
 00000000000i[DMA  ] channel 2 used by Floppy Drive
 00000000000i[FDD  ] tried to open '/dev/fd0' read/write: No such file or directory
@@ -98,4 +98,4 @@
 00000868383i[BIOS ] ata0-1: PCHS=16383/1/1 translation=large LCHS=1023/16/1
 00003000000i[WX   ] dimension update x=720 y=400 fontheight=16 fontwidth=9 bpp=8
 00030787405i[BIOS ] Booting from 0000:7c00
-01597717445p[     ] >>PANIC<< SIGNAL 2 caught
+01640259336p[     ] >>PANIC<< SIGNAL 2 caught

@@ -1666,7 +1666,7 @@ panic(char *s)
   100990:	89 04 24             	mov    %eax,(%esp)
   100993:	e8 28 fe ff ff       	call   1007c0 <cprintf>
   cprintf("\n");
-  100998:	c7 04 24 7c 6f 10 00 	movl   $0x106f7c,(%esp)
+  100998:	c7 04 24 7e 6f 10 00 	movl   $0x106f7e,(%esp)
   10099f:	e8 1c fe ff ff       	call   1007c0 <cprintf>
   getcallerpcs(&s, pcs);
   1009a4:	8d 45 08             	lea    0x8(%ebp),%eax
@@ -7821,18 +7821,18 @@ log_writei(struct inode *ip, char *src, uint off, uint n)
   102bef:	89 04 24             	mov    %eax,(%esp)
   102bf2:	e8 b9 eb ff ff       	call   1017b0 <writei>
   }
-  writei(log_ip, &t, 0, sizeof(struct transhead));		//write status
+  writei(log_ip, &t, 0, sizeof(struct transhead *));		//write status
   102bf7:	a1 fc bc 10 00       	mov    0x10bcfc,%eax
   102bfc:	8d 55 d4             	lea    -0x2c(%ebp),%edx
   102bff:	89 54 24 04          	mov    %edx,0x4(%esp)
   102c03:	89 55 c4             	mov    %edx,-0x3c(%ebp)
-  102c06:	c7 44 24 0c 14 00 00 	movl   $0x14,0xc(%esp)
+  102c06:	c7 44 24 0c 04 00 00 	movl   $0x4,0xc(%esp)
   102c0d:	00 
   102c0e:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
   102c15:	00 
   102c16:	89 04 24             	mov    %eax,(%esp)
   102c19:	e8 92 eb ff ff       	call   1017b0 <writei>
-  writei(log_ip, *src, BSIZE, n);							//write data to log file
+  writei(log_ip, *src, BSIZE, n);						//write data to log file
   102c1e:	89 5c 24 0c          	mov    %ebx,0xc(%esp)
   102c22:	c7 44 24 08 00 02 00 	movl   $0x200,0x8(%esp)
   102c29:	00 
@@ -7844,18 +7844,18 @@ log_writei(struct inode *ip, char *src, uint off, uint n)
 
   //data is logged, now time for the write -- BOO YA!
   t.status = LOGGED;
-  writei(log_ip, &t, 0, sizeof(struct transhead));
+  writei(log_ip, &t, 0, sizeof(struct transhead *));
   102c3e:	8b 55 c4             	mov    -0x3c(%ebp),%edx
   102c41:	a1 fc bc 10 00       	mov    0x10bcfc,%eax
   }
-  writei(log_ip, &t, 0, sizeof(struct transhead));		//write status
-  writei(log_ip, *src, BSIZE, n);							//write data to log file
+  writei(log_ip, &t, 0, sizeof(struct transhead *));		//write status
+  writei(log_ip, *src, BSIZE, n);						//write data to log file
 
   //data is logged, now time for the write -- BOO YA!
   t.status = LOGGED;
   102c46:	c7 45 d4 02 00 00 00 	movl   $0x2,-0x2c(%ebp)
-  writei(log_ip, &t, 0, sizeof(struct transhead));
-  102c4d:	c7 44 24 0c 14 00 00 	movl   $0x14,0xc(%esp)
+  writei(log_ip, &t, 0, sizeof(struct transhead *));
+  102c4d:	c7 44 24 0c 04 00 00 	movl   $0x4,0xc(%esp)
   102c54:	00 
   102c55:	89 54 24 04          	mov    %edx,0x4(%esp)
   102c59:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
@@ -7911,96 +7911,90 @@ void log_initialize(){
   102cb2:	c7 04 24 21 6f 10 00 	movl   $0x106f21,(%esp)
   102cb9:	89 44 24 04          	mov    %eax,0x4(%esp)
   102cbd:	e8 fe da ff ff       	call   1007c0 <cprintf>
-  102cc2:	31 c0                	xor    %eax,%eax
-  102cc4:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102cc2:	ba 31 6f 10 00       	mov    $0x106f31,%edx
+  102cc7:	31 c0                	xor    %eax,%eax
+  102cc9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
 
 	//create buffer as large as the block size
 	char buf[BSIZE];
 	int i;
 	for(i = 0; i < BSIZE; i++){
-		buf[i] = 0;
-  102cc8:	c6 04 06 00          	movb   $0x0,(%esi,%eax,1)
+		buf[i] = "0";
+  102cd0:	88 14 06             	mov    %dl,(%esi,%eax,1)
 	cprintf("ip->inum is %d\n", ip->inum);
 
 	//create buffer as large as the block size
 	char buf[BSIZE];
 	int i;
 	for(i = 0; i < BSIZE; i++){
-  102ccc:	83 c0 01             	add    $0x1,%eax
-  102ccf:	3d 00 02 00 00       	cmp    $0x200,%eax
-  102cd4:	75 f2                	jne    102cc8 <log_initialize+0x38>
-		buf[i] = 0;
+  102cd3:	83 c0 01             	add    $0x1,%eax
+  102cd6:	3d 00 02 00 00       	cmp    $0x200,%eax
+  102cdb:	75 f3                	jne    102cd0 <log_initialize+0x40>
+		buf[i] = "0";
 	}
 
 	//check if log exists, otherwise create it
 	int lsize = BSIZE*(LOGGED_BLOCKS+1);
 	ilock(ip);
-  102cd6:	89 1c 24             	mov    %ebx,(%esp)
-  102cd9:	e8 62 f2 ff ff       	call   101f40 <ilock>
+  102cdd:	89 1c 24             	mov    %ebx,(%esp)
+  102ce0:	e8 5b f2 ff ff       	call   101f40 <ilock>
 	if(ip->size != lsize){
-  102cde:	81 7b 18 00 16 00 00 	cmpl   $0x1600,0x18(%ebx)
-  102ce5:	74 28                	je     102d0f <log_initialize+0x7f>
+  102ce5:	81 7b 18 00 16 00 00 	cmpl   $0x1600,0x18(%ebx)
+  102cec:	74 28                	je     102d16 <log_initialize+0x86>
 		writei(ip, buf, 0, lsize);
-  102ce7:	c7 44 24 0c 00 16 00 	movl   $0x1600,0xc(%esp)
-  102cee:	00 
-  102cef:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
-  102cf6:	00 
-  102cf7:	89 74 24 04          	mov    %esi,0x4(%esp)
-  102cfb:	89 1c 24             	mov    %ebx,(%esp)
-  102cfe:	e8 ad ea ff ff       	call   1017b0 <writei>
+  102cee:	c7 44 24 0c 00 16 00 	movl   $0x1600,0xc(%esp)
+  102cf5:	00 
+  102cf6:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
+  102cfd:	00 
+  102cfe:	89 74 24 04          	mov    %esi,0x4(%esp)
+  102d02:	89 1c 24             	mov    %ebx,(%esp)
+  102d05:	e8 a6 ea ff ff       	call   1017b0 <writei>
 		cprintf("re-created log file");
-  102d03:	c7 04 24 31 6f 10 00 	movl   $0x106f31,(%esp)
-  102d0a:	e8 b1 da ff ff       	call   1007c0 <cprintf>
+  102d0a:	c7 04 24 33 6f 10 00 	movl   $0x106f33,(%esp)
+  102d11:	e8 aa da ff ff       	call   1007c0 <cprintf>
 	}
 	iunlock(ip);
-  102d0f:	89 1c 24             	mov    %ebx,(%esp)
-  102d12:	e8 b9 f1 ff ff       	call   101ed0 <iunlock>
+  102d16:	89 1c 24             	mov    %ebx,(%esp)
+  102d19:	e8 b2 f1 ff ff       	call   101ed0 <iunlock>
 	struct transhead t;
 	t.status = CLEAR;
 	t.currBlockIndex = 0;
 	t.offset = 0;
 	t.size = 0;
-	writei(ip, &t, 0, sizeof(struct transhead));
-  102d17:	8d 45 e4             	lea    -0x1c(%ebp),%eax
-  102d1a:	89 1c 24             	mov    %ebx,(%esp)
+	writei(ip, &t, 0, sizeof(struct transhead *));
+  102d1e:	8d 45 e4             	lea    -0x1c(%ebp),%eax
+  102d21:	89 1c 24             	mov    %ebx,(%esp)
 		cprintf("re-created log file");
 	}
 	iunlock(ip);
 
 	struct transhead t;
 	t.status = CLEAR;
-  102d1d:	c7 45 e4 00 00 00 00 	movl   $0x0,-0x1c(%ebp)
+  102d24:	c7 45 e4 00 00 00 00 	movl   $0x0,-0x1c(%ebp)
 	t.currBlockIndex = 0;
-  102d24:	c7 45 e8 00 00 00 00 	movl   $0x0,-0x18(%ebp)
+  102d2b:	c7 45 e8 00 00 00 00 	movl   $0x0,-0x18(%ebp)
 	t.offset = 0;
-  102d2b:	c7 45 f0 00 00 00 00 	movl   $0x0,-0x10(%ebp)
+  102d32:	c7 45 f0 00 00 00 00 	movl   $0x0,-0x10(%ebp)
 	t.size = 0;
-  102d32:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
-	writei(ip, &t, 0, sizeof(struct transhead));
-  102d39:	c7 44 24 0c 14 00 00 	movl   $0x14,0xc(%esp)
-  102d40:	00 
-  102d41:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
-  102d48:	00 
-  102d49:	89 44 24 04          	mov    %eax,0x4(%esp)
-  102d4d:	e8 5e ea ff ff       	call   1017b0 <writei>
+  102d39:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
+	writei(ip, &t, 0, sizeof(struct transhead *));
+  102d40:	c7 44 24 0c 04 00 00 	movl   $0x4,0xc(%esp)
+  102d47:	00 
+  102d48:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
+  102d4f:	00 
+  102d50:	89 44 24 04          	mov    %eax,0x4(%esp)
+  102d54:	e8 57 ea ff ff       	call   1017b0 <writei>
 
 	log_ip = ip;
-  102d52:	89 1d fc bc 10 00    	mov    %ebx,0x10bcfc
+  102d59:	89 1d fc bc 10 00    	mov    %ebx,0x10bcfc
 
 	return;
 }
-  102d58:	81 c4 30 02 00 00    	add    $0x230,%esp
-  102d5e:	5b                   	pop    %ebx
-  102d5f:	5e                   	pop    %esi
-  102d60:	5d                   	pop    %ebp
-  102d61:	c3                   	ret    
-  102d62:	90                   	nop
-  102d63:	90                   	nop
-  102d64:	90                   	nop
-  102d65:	90                   	nop
-  102d66:	90                   	nop
-  102d67:	90                   	nop
-  102d68:	90                   	nop
+  102d5f:	81 c4 30 02 00 00    	add    $0x230,%esp
+  102d65:	5b                   	pop    %ebx
+  102d66:	5e                   	pop    %esi
+  102d67:	5d                   	pop    %ebp
+  102d68:	c3                   	ret    
   102d69:	90                   	nop
   102d6a:	90                   	nop
   102d6b:	90                   	nop
@@ -8022,7 +8016,7 @@ mpmain(void)
   102d74:	83 ec 14             	sub    $0x14,%esp
   cprintf("cpu%d: mpmain\n", cpu());
   102d77:	e8 e4 fd ff ff       	call   102b60 <cpu>
-  102d7c:	c7 04 24 45 6f 10 00 	movl   $0x106f45,(%esp)
+  102d7c:	c7 04 24 47 6f 10 00 	movl   $0x106f47,(%esp)
   102d83:	89 44 24 04          	mov    %eax,0x4(%esp)
   102d87:	e8 34 da ff ff       	call   1007c0 <cprintf>
   idtinit();
@@ -8057,7 +8051,7 @@ xchg(volatile uint *addr, uint newval)
 
   cprintf("cpu%d: scheduling\n", cpu());
   102dd7:	e8 84 fd ff ff       	call   102b60 <cpu>
-  102ddc:	c7 04 24 54 6f 10 00 	movl   $0x106f54,(%esp)
+  102ddc:	c7 04 24 56 6f 10 00 	movl   $0x106f56,(%esp)
   102de3:	89 44 24 04          	mov    %eax,0x4(%esp)
   102de7:	e8 d4 d9 ff ff       	call   1007c0 <cprintf>
   scheduler();
@@ -8129,7 +8123,7 @@ main(void)
   102e39:	e8 a2 fa ff ff       	call   1028e0 <lapic_init>
   cprintf("\ncpu%d: starting xv6\n\n", cpu());
   102e3e:	e8 1d fd ff ff       	call   102b60 <cpu>
-  102e43:	c7 04 24 67 6f 10 00 	movl   $0x106f67,(%esp)
+  102e43:	c7 04 24 69 6f 10 00 	movl   $0x106f69,(%esp)
   102e4a:	89 44 24 04          	mov    %eax,0x4(%esp)
   102e4e:	e8 6d d9 ff ff       	call   1007c0 <cprintf>
 
@@ -8324,7 +8318,7 @@ mp_search1(uchar *addr, int len)
     if(memcmp(p, "_MP_", 4) == 0 && sum(p, sizeof(struct mp)) == 0)
   102f98:	c7 44 24 08 04 00 00 	movl   $0x4,0x8(%esp)
   102f9f:	00 
-  102fa0:	c7 44 24 04 7e 6f 10 	movl   $0x106f7e,0x4(%esp)
+  102fa0:	c7 44 24 04 80 6f 10 	movl   $0x106f80,0x4(%esp)
   102fa7:	00 
   102fa8:	89 1c 24             	mov    %ebx,(%esp)
   102fab:	e8 e0 19 00 00       	call   104990 <memcmp>
@@ -8498,7 +8492,7 @@ mp_config(struct mp **pmp)
   if(memcmp(conf, "PCMP", 4) != 0)
   103068:	c7 44 24 08 04 00 00 	movl   $0x4,0x8(%esp)
   10306f:	00 
-  103070:	c7 44 24 04 83 6f 10 	movl   $0x106f83,0x4(%esp)
+  103070:	c7 44 24 04 85 6f 10 	movl   $0x106f85,0x4(%esp)
   103077:	00 
   103078:	89 34 24             	mov    %esi,(%esp)
   10307b:	e8 10 19 00 00       	call   104990 <memcmp>
@@ -8600,10 +8594,10 @@ sum(uchar *addr, int len)
     default:
       cprintf("mp_init: unknown config type %x\n", *p);
   1030e9:	89 4c 24 04          	mov    %ecx,0x4(%esp)
-  1030ed:	c7 04 24 90 6f 10 00 	movl   $0x106f90,(%esp)
+  1030ed:	c7 04 24 94 6f 10 00 	movl   $0x106f94,(%esp)
   1030f4:	e8 c7 d6 ff ff       	call   1007c0 <cprintf>
       panic("mp_init");
-  1030f9:	c7 04 24 88 6f 10 00 	movl   $0x106f88,(%esp)
+  1030f9:	c7 04 24 8a 6f 10 00 	movl   $0x106f8a,(%esp)
   103100:	e8 5b d8 ff ff       	call   100960 <panic>
   103105:	8d 76 00             	lea    0x0(%esi),%esi
   } else {
@@ -8656,7 +8650,7 @@ mp_config(struct mp **pmp)
   for(p=(uchar*)(conf+1), e=(uchar*)conf+conf->length; p<e; ){
     switch(*p){
   103130:	0f b6 c9             	movzbl %cl,%ecx
-  103133:	ff 24 8d b4 6f 10 00 	jmp    *0x106fb4(,%ecx,4)
+  103133:	ff 24 8d b8 6f 10 00 	jmp    *0x106fb8(,%ecx,4)
   10313a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
       p += sizeof(struct mpioapic);
       continue;
@@ -9371,7 +9365,7 @@ pipealloc(struct file **f0, struct file **f1)
   initlock(&p->lock, "pipe");
   103562:	8d 40 10             	lea    0x10(%eax),%eax
   103565:	89 04 24             	mov    %eax,(%esp)
-  103568:	c7 44 24 04 c8 6f 10 	movl   $0x106fc8,0x4(%esp)
+  103568:	c7 44 24 04 cc 6f 10 	movl   $0x106fcc,0x4(%esp)
   10356f:	00 
   103570:	e8 bb 11 00 00       	call   104730 <initlock>
   (*f0)->type = FD_PIPE;
@@ -9570,7 +9564,7 @@ procdump(void)
     if(p->state == UNUSED)
       continue;
     if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
-  103668:	8b 04 85 90 70 10 00 	mov    0x107090(,%eax,4),%eax
+  103668:	8b 04 85 94 70 10 00 	mov    0x107094(,%eax,4),%eax
   10366f:	85 c0                	test   %eax,%eax
   103671:	74 4e                	je     1036c1 <procdump+0x71>
       state = states[p->state];
@@ -9581,7 +9575,7 @@ procdump(void)
   103677:	8b 43 04             	mov    0x4(%ebx),%eax
   10367a:	81 c2 88 00 00 00    	add    $0x88,%edx
   103680:	89 54 24 0c          	mov    %edx,0xc(%esp)
-  103684:	c7 04 24 d1 6f 10 00 	movl   $0x106fd1,(%esp)
+  103684:	c7 04 24 d5 6f 10 00 	movl   $0x106fd5,(%esp)
   10368b:	89 44 24 04          	mov    %eax,0x4(%esp)
   10368f:	e8 2c d1 ff ff       	call   1007c0 <cprintf>
     if(p->state == SLEEPING){
@@ -9592,7 +9586,7 @@ procdump(void)
         cprintf(" %p", pc[j]);
     }
     cprintf("\n");
-  103699:	c7 04 24 7c 6f 10 00 	movl   $0x106f7c,(%esp)
+  103699:	c7 04 24 7e 6f 10 00 	movl   $0x106f7e,(%esp)
   1036a0:	e8 1b d1 ff ff       	call   1007c0 <cprintf>
   1036a5:	81 c3 9c 00 00 00    	add    $0x9c,%ebx
   int i, j;
@@ -9625,7 +9619,7 @@ procdump(void)
     if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
   1036bc:	83 f8 05             	cmp    $0x5,%eax
   1036bf:	76 a7                	jbe    103668 <procdump+0x18>
-  1036c1:	b8 cd 6f 10 00       	mov    $0x106fcd,%eax
+  1036c1:	b8 d1 6f 10 00       	mov    $0x106fd1,%eax
   1036c6:	eb ab                	jmp    103673 <procdump+0x23>
       state = states[p->state];
     else
@@ -10119,7 +10113,7 @@ sched(void)
 {
   if(read_eflags()&FL_IF)
     panic("sched interruptible");
-  10397a:	c7 04 24 da 6f 10 00 	movl   $0x106fda,(%esp)
+  10397a:	c7 04 24 de 6f 10 00 	movl   $0x106fde,(%esp)
   103981:	e8 da cf ff ff       	call   100960 <panic>
   if(cp->state == RUNNING)
     panic("sched running");
@@ -10127,7 +10121,7 @@ sched(void)
     panic("sched proc_table_lock");
   if(cpus[cpu()].ncli != 1)
     panic("sched locks");
-  103986:	c7 04 24 12 70 10 00 	movl   $0x107012,(%esp)
+  103986:	c7 04 24 16 70 10 00 	movl   $0x107016,(%esp)
   10398d:	e8 ce cf ff ff       	call   100960 <panic>
   if(read_eflags()&FL_IF)
     panic("sched interruptible");
@@ -10135,7 +10129,7 @@ sched(void)
     panic("sched running");
   if(!holding(&proc_table_lock))
     panic("sched proc_table_lock");
-  103992:	c7 04 24 fc 6f 10 00 	movl   $0x106ffc,(%esp)
+  103992:	c7 04 24 00 70 10 00 	movl   $0x107000,(%esp)
   103999:	e8 c2 cf ff ff       	call   100960 <panic>
 sched(void)
 {
@@ -10143,7 +10137,7 @@ sched(void)
     panic("sched interruptible");
   if(cp->state == RUNNING)
     panic("sched running");
-  10399e:	c7 04 24 ee 6f 10 00 	movl   $0x106fee,(%esp)
+  10399e:	c7 04 24 f2 6f 10 00 	movl   $0x106ff2,(%esp)
   1039a5:	e8 b6 cf ff ff       	call   100960 <panic>
   1039aa:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
 
@@ -10335,7 +10329,7 @@ wakeup1(void *chan)
   sched();
   103af0:	e8 1b fe ff ff       	call   103910 <sched>
   panic("zombie exit");
-  103af5:	c7 04 24 2b 70 10 00 	movl   $0x10702b,(%esp)
+  103af5:	c7 04 24 2f 70 10 00 	movl   $0x10702f,(%esp)
   103afc:	e8 5f ce ff ff       	call   100960 <panic>
 {
   struct proc *p;
@@ -10343,7 +10337,7 @@ wakeup1(void *chan)
 
   if(cp == initproc)
     panic("init exiting");
-  103b01:	c7 04 24 1e 70 10 00 	movl   $0x10701e,(%esp)
+  103b01:	c7 04 24 22 70 10 00 	movl   $0x107022,(%esp)
   103b08:	e8 53 ce ff ff       	call   100960 <panic>
   103b0d:	8d 76 00             	lea    0x0(%esi),%esi
 
@@ -10382,7 +10376,7 @@ void sleep_lock(void)
 {
   if(cp == 0)
     panic("sleep");
-  103b4a:	c7 04 24 37 70 10 00 	movl   $0x107037,(%esp)
+  103b4a:	c7 04 24 3b 70 10 00 	movl   $0x10703b,(%esp)
   103b51:	e8 0a ce ff ff       	call   100960 <panic>
   103b56:	8d 76 00             	lea    0x0(%esi),%esi
   103b59:	8d bc 27 00 00 00 00 	lea    0x0(%edi,%eiz,1),%edi
@@ -10497,7 +10491,7 @@ sleep(void *chan, struct spinlock *lk)
 
   if(lk == 0)
     panic("sleep without lk");
-  103c0c:	c7 04 24 3d 70 10 00 	movl   $0x10703d,(%esp)
+  103c0c:	c7 04 24 41 70 10 00 	movl   $0x107041,(%esp)
   103c13:	e8 48 cd ff ff       	call   100960 <panic>
 // Reacquires lock when reawakened.
 void
@@ -10505,7 +10499,7 @@ sleep(void *chan, struct spinlock *lk)
 {
   if(cp == 0)
     panic("sleep");
-  103c18:	c7 04 24 37 70 10 00 	movl   $0x107037,(%esp)
+  103c18:	c7 04 24 3b 70 10 00 	movl   $0x10703b,(%esp)
   103c1f:	e8 3c cd ff ff       	call   100960 <panic>
   103c24:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
   103c2a:	8d bf 00 00 00 00    	lea    0x0(%edi),%edi
@@ -12078,7 +12072,7 @@ userinit(void)
   104643:	e8 88 df ff ff       	call   1025d0 <kalloc>
   104648:	89 03                	mov    %eax,(%ebx)
   p->cwd = namei("/");
-  10464a:	c7 04 24 4e 70 10 00 	movl   $0x10704e,(%esp)
+  10464a:	c7 04 24 52 70 10 00 	movl   $0x107052,(%esp)
   104651:	e8 aa db ff ff       	call   102200 <namei>
   104656:	89 43 60             	mov    %eax,0x60(%ebx)
   memset(p->tf, 0, sizeof(*p->tf));
@@ -12158,7 +12152,7 @@ userinit(void)
   1046d3:	8d 83 88 00 00 00    	lea    0x88(%ebx),%eax
   1046d9:	c7 44 24 08 10 00 00 	movl   $0x10,0x8(%esp)
   1046e0:	00 
-  1046e1:	c7 44 24 04 50 70 10 	movl   $0x107050,0x4(%esp)
+  1046e1:	c7 44 24 04 54 70 10 	movl   $0x107054,0x4(%esp)
   1046e8:	00 
   1046e9:	89 04 24             	mov    %eax,(%esp)
   1046ec:	e8 0f 04 00 00       	call   104b00 <safestrcpy>
@@ -12186,7 +12180,7 @@ pinit(void)
   104711:	89 e5                	mov    %esp,%ebp
   104713:	83 ec 18             	sub    $0x18,%esp
   initlock(&proc_table_lock, "proc_table");
-  104716:	c7 44 24 04 59 70 10 	movl   $0x107059,0x4(%esp)
+  104716:	c7 44 24 04 5d 70 10 	movl   $0x10705d,0x4(%esp)
   10471d:	00 
   10471e:	c7 04 24 a0 ea 10 00 	movl   $0x10eaa0,(%esp)
   104725:	e8 06 00 00 00       	call   104730 <initlock>
@@ -12414,7 +12408,7 @@ popcli(void)
     panic("popcli - interruptible");
   if(--cpus[cpu()].ncli < 0)
     panic("popcli");
-  104800:	c7 04 24 bf 70 10 00 	movl   $0x1070bf,(%esp)
+  104800:	c7 04 24 c3 70 10 00 	movl   $0x1070c3,(%esp)
   104807:	e8 54 c1 ff ff       	call   100960 <panic>
 
 void
@@ -12422,7 +12416,7 @@ popcli(void)
 {
   if(read_eflags()&FL_IF)
     panic("popcli - interruptible");
-  10480c:	c7 04 24 a8 70 10 00 	movl   $0x1070a8,(%esp)
+  10480c:	c7 04 24 ac 70 10 00 	movl   $0x1070ac,(%esp)
   104813:	e8 48 c1 ff ff       	call   100960 <panic>
   104818:	90                   	nop
   104819:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
@@ -12599,7 +12593,7 @@ release(struct spinlock *lock)
 {
   if(!holding(lock))
     panic("release");
-  1048e3:	c7 04 24 c6 70 10 00 	movl   $0x1070c6,(%esp)
+  1048e3:	c7 04 24 ca 70 10 00 	movl   $0x1070ca,(%esp)
   1048ea:	e8 71 c0 ff ff       	call   100960 <panic>
   1048ef:	90                   	nop
 
@@ -12663,7 +12657,7 @@ acquire(struct spinlock *lock)
   pushcli();
   if(holding(lock))
     panic("acquire");
-  104948:	c7 04 24 ce 70 10 00 	movl   $0x1070ce,(%esp)
+  104948:	c7 04 24 d2 70 10 00 	movl   $0x1070d2,(%esp)
   10494f:	e8 0c c0 ff ff       	call   100960 <panic>
   104954:	90                   	nop
   104955:	90                   	nop
@@ -13582,7 +13576,7 @@ syscall(void)
   104dba:	89 5c 24 0c          	mov    %ebx,0xc(%esp)
   104dbe:	89 74 24 08          	mov    %esi,0x8(%esp)
   104dc2:	8b 40 10             	mov    0x10(%eax),%eax
-  104dc5:	c7 04 24 d6 70 10 00 	movl   $0x1070d6,(%esp)
+  104dc5:	c7 04 24 da 70 10 00 	movl   $0x1070da,(%esp)
   104dcc:	89 44 24 04          	mov    %eax,0x4(%esp)
   104dd0:	e8 eb b9 ff ff       	call   1007c0 <cprintf>
             cp->pid, cp->name, num);

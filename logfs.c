@@ -54,7 +54,7 @@ void log_initialize(){
 	char buf[BSIZE];
 	int i;
 	for(i = 0; i < BSIZE; i++){
-		buf[i] = 0;
+		buf[i] = "0";
 	}
 
 	//check if log exists, otherwise create it
@@ -71,7 +71,7 @@ void log_initialize(){
 	t.currBlockIndex = 0;
 	t.offset = 0;
 	t.size = 0;
-	writei(ip, &t, 0, sizeof(struct transhead));
+	writei(ip, &t, 0, sizeof(struct transhead *));
 
 	log_ip = ip;
 
@@ -96,12 +96,12 @@ log_writei(struct inode *ip, char *src, uint off, uint n)
   if(n > BSIZE*LOGGED_BLOCKS){
 	  writei(ip, src, off, n);
   }
-  writei(log_ip, &t, 0, sizeof(struct transhead));		//write status
-  writei(log_ip, *src, BSIZE, n);							//write data to log file
+  writei(log_ip, &t, 0, sizeof(struct transhead *));		//write status
+  writei(log_ip, *src, BSIZE, n);						//write data to log file
 
   //data is logged, now time for the write -- BOO YA!
   t.status = LOGGED;
-  writei(log_ip, &t, 0, sizeof(struct transhead));
+  writei(log_ip, &t, 0, sizeof(struct transhead *));
   writei(ip, src, off, n);
 
   //writing to the log if finally done, god that took forever

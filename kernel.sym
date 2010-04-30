@@ -52,7 +52,7 @@
 00108560 irqmask
 00000000 pipe.c
 00000000 proc.c
-00107090 states.1772
+00107094 states.1772
 00103830 allocproc
 00108aa8 initproc
 00000000 spinlock.c

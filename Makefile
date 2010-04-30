@@ -105,6 +105,7 @@ UPROGS=\
 	_grep\
 	_init\
 	_kill\
+	_logfs_test1\
 	_ln\
 	_ls\
 	_mkdir\
