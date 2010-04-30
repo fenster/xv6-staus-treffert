@@ -662,6 +662,7 @@ skipelem(char *path, char *name)
 static struct inode*
 _namei(char *path, int parent, char *name)
 {
+	//cprintf("Path: %s\n", path);
   struct inode *ip, *next;
 
   if(*path == '/')
@@ -669,19 +670,24 @@ _namei(char *path, int parent, char *name)
   else
     ip = idup(cp->cwd);
 
+  //cprintf("cp name: %s\n", cp->name);
+
   while((path = skipelem(path, name)) != 0){
     ilock(ip);
     if(ip->type != T_DIR){
       iunlockput(ip);
+      //cprintf("HERE\n");
       return 0;
     }
     if(parent && *path == '\0'){
       // Stop one level early.
       iunlock(ip);
+      //cprintf("HERE3\n");
       return ip;
     }
     if((next = dirlookup(ip, name, 0)) == 0){
       iunlockput(ip);
+      //cprintf("HERE1\n");
       return 0;
     }
     iunlockput(ip);
@@ -689,8 +695,10 @@ _namei(char *path, int parent, char *name)
   }
   if(parent){
     iput(ip);
+    //cprintf("HERE2\n");
     return 0;
   }
+  //cprintf("HERE4-2: %d\n", ip);
   return ip;
 }
 

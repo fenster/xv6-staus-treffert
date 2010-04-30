@@ -915,14 +915,11 @@ gets(char *buf, int max)
  4a0:	b8 1b 00 00 00       	mov    $0x1b,%eax
  4a5:	cd 30                	int    $0x30
  4a7:	c3                   	ret    
- 4a8:	90                   	nop
- 4a9:	90                   	nop
- 4aa:	90                   	nop
- 4ab:	90                   	nop
- 4ac:	90                   	nop
- 4ad:	90                   	nop
- 4ae:	90                   	nop
- 4af:	90                   	nop
+
+000004a8 <log_init>:
+ 4a8:	b8 1c 00 00 00       	mov    $0x1c,%eax
+ 4ad:	cd 30                	int    $0x30
+ 4af:	c3                   	ret    
 
 000004b0 <putc>:
 

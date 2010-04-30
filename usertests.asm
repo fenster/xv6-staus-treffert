@@ -5136,9 +5136,9 @@ pipe1(void)
     26c0:	0f 8e 52 01 00 00    	jle    2818 <pipe1+0x188>
     close(fds[1]);
     26c6:	8b 45 e4             	mov    -0x1c(%ebp),%eax
-    26c9:	31 ff                	xor    %edi,%edi
-    26cb:	be 01 00 00 00       	mov    $0x1,%esi
-    26d0:	31 db                	xor    %ebx,%ebx
+    26c9:	be 01 00 00 00       	mov    $0x1,%esi
+    26ce:	31 db                	xor    %ebx,%ebx
+    26d0:	31 ff                	xor    %edi,%edi
     26d2:	89 04 24             	mov    %eax,(%esp)
     26d5:	e8 66 06 00 00       	call   2d40 <close>
     total = 0;
@@ -6322,14 +6322,11 @@ gets(char *buf, int max)
     2de0:	b8 1b 00 00 00       	mov    $0x1b,%eax
     2de5:	cd 30                	int    $0x30
     2de7:	c3                   	ret    
-    2de8:	90                   	nop
-    2de9:	90                   	nop
-    2dea:	90                   	nop
-    2deb:	90                   	nop
-    2dec:	90                   	nop
-    2ded:	90                   	nop
-    2dee:	90                   	nop
-    2def:	90                   	nop
+
+00002de8 <log_init>:
+    2de8:	b8 1c 00 00 00       	mov    $0x1c,%eax
+    2ded:	cd 30                	int    $0x30
+    2def:	c3                   	ret    
 
 00002df0 <putc>:
 

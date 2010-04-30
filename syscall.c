@@ -103,6 +103,7 @@ extern int sys_wait_thread(void);
 extern int sys_sleep_lock(void);
 extern int sys_wake_lock(void);
 extern int sys_check(void);
+extern int sys_log_init(void);
 
 static int (*syscalls[])(void) = {
 [SYS_chdir]   		sys_chdir,
@@ -132,6 +133,7 @@ static int (*syscalls[])(void) = {
 [SYS_sleep_lock]	sys_sleep_lock,
 [SYS_wake_lock]		sys_wake_lock,
 [SYS_check]			sys_check,
+[SYS_log_init]		sys_log_init,
 };
 
 void

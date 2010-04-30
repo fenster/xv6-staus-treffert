@@ -15,13 +15,14 @@
 00000000 printf.c
 000004b0 putc
 000004e0 printint
-000008bd digits.918
+000008bd digits.920
 00000000 umalloc.c
 000008e8 freep
 000008e0 base
 000001a0 strcpy
 00000570 printf
 000002f0 memmove
+000004a8 log_init
 00000420 mknod
 00000370 gets
 00000458 getpid

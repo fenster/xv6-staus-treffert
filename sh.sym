@@ -12,12 +12,12 @@
 00000000 .debug_str
 00000000 .debug_loc
 00000000 sh.c
-000016e0 buf.997
+000016e0 buf.999
 00000000 ulib.c
 00000000 printf.c
 000011a0 putc
 000011d0 printint
-000016af digits.918
+000016af digits.920
 00000000 umalloc.c
 0000174c freep
 00001744 base
@@ -25,6 +25,7 @@
 00001260 printf
 00000940 lottery_test
 00000fe0 memmove
+00001198 log_init
 00001110 mknod
 000004e0 execcmd
 00001060 gets

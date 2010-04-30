@@ -1217,14 +1217,11 @@ gets(char *buf, int max)
  630:	b8 1b 00 00 00       	mov    $0x1b,%eax
  635:	cd 30                	int    $0x30
  637:	c3                   	ret    
- 638:	90                   	nop
- 639:	90                   	nop
- 63a:	90                   	nop
- 63b:	90                   	nop
- 63c:	90                   	nop
- 63d:	90                   	nop
- 63e:	90                   	nop
- 63f:	90                   	nop
+
+00000638 <log_init>:
+ 638:	b8 1c 00 00 00       	mov    $0x1c,%eax
+ 63d:	cd 30                	int    $0x30
+ 63f:	c3                   	ret    
 
 00000640 <putc>:
 

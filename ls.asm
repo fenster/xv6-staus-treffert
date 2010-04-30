@@ -1048,14 +1048,11 @@ gets(char *buf, int max)
  660:	b8 1b 00 00 00       	mov    $0x1b,%eax
  665:	cd 30                	int    $0x30
  667:	c3                   	ret    
- 668:	90                   	nop
- 669:	90                   	nop
- 66a:	90                   	nop
- 66b:	90                   	nop
- 66c:	90                   	nop
- 66d:	90                   	nop
- 66e:	90                   	nop
- 66f:	90                   	nop
+
+00000668 <log_init>:
+ 668:	b8 1c 00 00 00       	mov    $0x1c,%eax
+ 66d:	cd 30                	int    $0x30
+ 66f:	c3                   	ret    
 
 00000670 <putc>:
 

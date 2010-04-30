@@ -54,7 +54,7 @@ forktest(void)
   int n, pid;
 
   printf(1, "fork test\n");
-  39:	c7 44 24 04 18 04 00 	movl   $0x418,0x4(%esp)
+  39:	c7 44 24 04 20 04 00 	movl   $0x420,0x4(%esp)
   40:	00 
   41:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
   48:	e8 b3 ff ff ff       	call   0 <printf>
@@ -121,7 +121,7 @@ forktest(void)
   }
   
   printf(1, "fork test OK\n");
-  92:	c7 44 24 04 4a 04 00 	movl   $0x44a,0x4(%esp)
+  92:	c7 44 24 04 52 04 00 	movl   $0x452,0x4(%esp)
   99:	00 
   9a:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
   a1:	e8 5a ff ff ff       	call   0 <printf>
@@ -137,7 +137,7 @@ forktest(void)
   
   if(n == 1000){
     printf(1, "fork claimed to work 1000 times!\n");
-  b0:	c7 44 24 04 58 04 00 	movl   $0x458,0x4(%esp)
+  b0:	c7 44 24 04 60 04 00 	movl   $0x460,0x4(%esp)
   b7:	00 
   b8:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
   bf:	e8 3c ff ff ff       	call   0 <printf>
@@ -148,7 +148,7 @@ forktest(void)
   for(; n > 0; n--){
     if(wait() < 0){
       printf(1, "wait stopped early\n");
-  c9:	c7 44 24 04 23 04 00 	movl   $0x423,0x4(%esp)
+  c9:	c7 44 24 04 2b 04 00 	movl   $0x42b,0x4(%esp)
   d0:	00 
   d1:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
   d8:	e8 23 ff ff ff       	call   0 <printf>
@@ -159,7 +159,7 @@ forktest(void)
   
   if(wait() != -1){
     printf(1, "wait got too many\n");
-  e2:	c7 44 24 04 37 04 00 	movl   $0x437,0x4(%esp)
+  e2:	c7 44 24 04 3f 04 00 	movl   $0x43f,0x4(%esp)
   e9:	00 
   ea:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
   f1:	e8 0a ff ff ff       	call   0 <printf>
@@ -822,3 +822,8 @@ gets(char *buf, int max)
  410:	b8 1b 00 00 00       	mov    $0x1b,%eax
  415:	cd 30                	int    $0x30
  417:	c3                   	ret    
+
+00000418 <log_init>:
+ 418:	b8 1c 00 00 00       	mov    $0x1c,%eax
+ 41d:	cd 30                	int    $0x30
+ 41f:	c3                   	ret    

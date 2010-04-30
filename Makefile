@@ -9,6 +9,7 @@ OBJS = \
 	kalloc.o\
 	kbd.o\
 	lapic.o\
+	logfs.o\
 	main.o\
 	mp.o\
 	picirq.o\
@@ -115,8 +116,8 @@ UPROGS=\
 	_wc\
 	_zombie\
 
-fs.img: mkfs README $(UPROGS)
-	./mkfs fs.img README $(UPROGS)
+fs.img: mkfs README log $(UPROGS)
+	./mkfs fs.img README log $(UPROGS)
 
 -include *.d
 

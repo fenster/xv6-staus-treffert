@@ -74,6 +74,10 @@ void            lapic_eoi(void);
 void            lapic_init(int);
 void            lapic_startap(uchar, uint);
 
+//logfs.c
+void			log_initialize();
+int				log_writei(struct inode *ip, char *src, uint off, uint n);
+
 // mp.c
 extern int      ismp;
 int             mp_bcpu(void);

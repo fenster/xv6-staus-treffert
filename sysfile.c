@@ -266,6 +266,8 @@ sys_open(void)
   if(argstr(0, &path) < 0 || argint(1, &omode) < 0)
     return -1;
 
+  //cprintf("%s\n", path);
+
   if(omode & O_CREATE){
     if((ip = create(path, 1, T_FILE, 0, 0)) == 0)
       return -1;
@@ -395,6 +397,7 @@ sys_pipe(void)
 
 int sys_check(void){
 
+
 	struct file *f;
 	int off;
 
@@ -402,6 +405,14 @@ int sys_check(void){
 		return -1;
 	return filecheck(f, off);
 
+	log_initialize();
+
+}
+
+void sys_log_init(void){
+
+	log_initialize();
+	return;
 }
 
 

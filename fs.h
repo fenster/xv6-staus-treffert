@@ -5,6 +5,14 @@
 // Block 1 is super block.
 // Inodes start at block 2.
 
+#define NADDRS (NDIRECT+2)
+#define NDIRECT 11
+#define INDIRECT 11
+#define DINDIRECT 12
+#define NINDIRECT (BSIZE / sizeof(uint))
+#define NDINDIRECT (NINDIRECT * NINDIRECT)
+#define MAXFILE (NDIRECT  + NINDIRECT + NDINDIRECT)
+
 #define BSIZE 512  // block size
 
 // File system super block
@@ -14,13 +22,6 @@ struct superblock {
   uint ninodes;      // Number of inodes.
 };
 
-#define NADDRS (NDIRECT+2)
-#define NDIRECT 11
-#define INDIRECT 11
-#define DINDIRECT 12
-#define NINDIRECT (BSIZE / sizeof(uint))
-#define NDINDIRECT (NINDIRECT * NINDIRECT)
-#define MAXFILE (NDIRECT  + NINDIRECT + NDINDIRECT)
 
 // On-disk inode structure
 struct dinode {

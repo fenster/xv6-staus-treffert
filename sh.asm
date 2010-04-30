@@ -2797,14 +2797,11 @@ gets(char *buf, int max)
     1190:	b8 1b 00 00 00       	mov    $0x1b,%eax
     1195:	cd 30                	int    $0x30
     1197:	c3                   	ret    
-    1198:	90                   	nop
-    1199:	90                   	nop
-    119a:	90                   	nop
-    119b:	90                   	nop
-    119c:	90                   	nop
-    119d:	90                   	nop
-    119e:	90                   	nop
-    119f:	90                   	nop
+
+00001198 <log_init>:
+    1198:	b8 1c 00 00 00       	mov    $0x1c,%eax
+    119d:	cd 30                	int    $0x30
+    119f:	c3                   	ret    
 
 000011a0 <putc>:
 

@@ -16,7 +16,7 @@
 00000000 printf.c
 00002df0 putc
 00002e20 printint
-00004407 digits.918
+00004407 digits.920
 00000000 umalloc.c
 00004448 freep
 00004440 base
@@ -25,6 +25,7 @@
 00002eb0 printf
 00004438 stdout
 00002c30 memmove
+00002de8 log_init
 00002d60 mknod
 00002cb0 gets
 00002d98 getpid

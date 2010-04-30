@@ -26,4 +26,5 @@
 #define SYS_fork_thread 25
 #define SYS_wait_thread 26
 #define SYS_check		27
+#define SYS_log_init	28
 

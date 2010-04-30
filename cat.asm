@@ -824,14 +824,11 @@ gets(char *buf, int max)
  410:	b8 1b 00 00 00       	mov    $0x1b,%eax
  415:	cd 30                	int    $0x30
  417:	c3                   	ret    
- 418:	90                   	nop
- 419:	90                   	nop
- 41a:	90                   	nop
- 41b:	90                   	nop
- 41c:	90                   	nop
- 41d:	90                   	nop
- 41e:	90                   	nop
- 41f:	90                   	nop
+
+00000418 <log_init>:
+ 418:	b8 1c 00 00 00       	mov    $0x1c,%eax
+ 41d:	cd 30                	int    $0x30
+ 41f:	c3                   	ret    
 
 00000420 <putc>:
 

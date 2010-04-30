@@ -24,7 +24,7 @@ main(void)
   12:	c7 04 24 fe 07 00 00 	movl   $0x7fe,(%esp)
   19:	e8 7a 03 00 00       	call   398 <open>
   1e:	85 c0                	test   %eax,%eax
-  20:	0f 88 b7 00 00 00    	js     dd <main+0xdd>
+  20:	0f 88 bf 00 00 00    	js     e5 <main+0xe5>
     mknod("console", 1, 1);
     open("console", O_RDWR);
   }
@@ -34,104 +34,100 @@ main(void)
   dup(0);  // stderr
   32:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
   39:	e8 92 03 00 00       	call   3d0 <dup>
-  3e:	66 90                	xchg   %ax,%ax
+
+  log_init();
+  3e:	e8 e5 03 00 00       	call   428 <log_init>
+  43:	90                   	nop
+  44:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
 
   for(;;){
     printf(1, "init: starting sh\n");
-  40:	c7 44 24 04 06 08 00 	movl   $0x806,0x4(%esp)
-  47:	00 
-  48:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
-  4f:	e8 9c 04 00 00       	call   4f0 <printf>
+  48:	c7 44 24 04 06 08 00 	movl   $0x806,0x4(%esp)
+  4f:	00 
+  50:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+  57:	e8 94 04 00 00       	call   4f0 <printf>
     pid = fork();
-  54:	e8 f7 02 00 00       	call   350 <fork>
+  5c:	e8 ef 02 00 00       	call   350 <fork>
     if(pid < 0){
-  59:	83 f8 00             	cmp    $0x0,%eax
-  dup(0);  // stdout
-  dup(0);  // stderr
+  61:	83 f8 00             	cmp    $0x0,%eax
+
+  log_init();
 
   for(;;){
     printf(1, "init: starting sh\n");
     pid = fork();
-  5c:	89 c3                	mov    %eax,%ebx
+  64:	89 c3                	mov    %eax,%ebx
     if(pid < 0){
-  5e:	7c 30                	jl     90 <main+0x90>
+  66:	7c 30                	jl     98 <main+0x98>
       printf(1, "init: fork failed\n");
       exit();
     }
     if(pid == 0){
-  60:	74 4e                	je     b0 <main+0xb0>
-  62:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+  68:	74 4e                	je     b8 <main+0xb8>
+  6a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
       exec("sh", sh_args);
       printf(1, "init: exec sh failed\n");
       exit();
     }
     while((wpid=wait()) >= 0 && wpid != pid)
-  68:	e8 f3 02 00 00       	call   360 <wait>
-  6d:	85 c0                	test   %eax,%eax
-  6f:	90                   	nop
-  70:	78 ce                	js     40 <main+0x40>
-  72:	39 c3                	cmp    %eax,%ebx
-  74:	74 ca                	je     40 <main+0x40>
+  70:	e8 eb 02 00 00       	call   360 <wait>
+  75:	85 c0                	test   %eax,%eax
+  77:	78 cf                	js     48 <main+0x48>
+  79:	39 c3                	cmp    %eax,%ebx
+  7b:	74 cb                	je     48 <main+0x48>
       printf(1, "zombie!\n");
-  76:	c7 44 24 04 45 08 00 	movl   $0x845,0x4(%esp)
-  7d:	00 
-  7e:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
-  85:	e8 66 04 00 00       	call   4f0 <printf>
-  8a:	eb d6                	jmp    62 <main+0x62>
-  8c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  7d:	c7 44 24 04 45 08 00 	movl   $0x845,0x4(%esp)
+  84:	00 
+  85:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+  8c:	e8 5f 04 00 00       	call   4f0 <printf>
+  91:	eb d7                	jmp    6a <main+0x6a>
+  93:	90                   	nop
+  94:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
 
   for(;;){
     printf(1, "init: starting sh\n");
     pid = fork();
     if(pid < 0){
       printf(1, "init: fork failed\n");
-  90:	c7 44 24 04 19 08 00 	movl   $0x819,0x4(%esp)
-  97:	00 
-  98:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
-  9f:	e8 4c 04 00 00       	call   4f0 <printf>
+  98:	c7 44 24 04 19 08 00 	movl   $0x819,0x4(%esp)
+  9f:	00 
+  a0:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+  a7:	e8 44 04 00 00       	call   4f0 <printf>
       exit();
-  a4:	e8 af 02 00 00       	call   358 <exit>
-  a9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  ac:	e8 a7 02 00 00       	call   358 <exit>
+  b1:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
     }
     if(pid == 0){
       exec("sh", sh_args);
-  b0:	c7 44 24 04 68 08 00 	movl   $0x868,0x4(%esp)
-  b7:	00 
-  b8:	c7 04 24 2c 08 00 00 	movl   $0x82c,(%esp)
-  bf:	e8 cc 02 00 00       	call   390 <exec>
+  b8:	c7 44 24 04 68 08 00 	movl   $0x868,0x4(%esp)
+  bf:	00 
+  c0:	c7 04 24 2c 08 00 00 	movl   $0x82c,(%esp)
+  c7:	e8 c4 02 00 00       	call   390 <exec>
       printf(1, "init: exec sh failed\n");
-  c4:	c7 44 24 04 2f 08 00 	movl   $0x82f,0x4(%esp)
-  cb:	00 
-  cc:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
-  d3:	e8 18 04 00 00       	call   4f0 <printf>
+  cc:	c7 44 24 04 2f 08 00 	movl   $0x82f,0x4(%esp)
+  d3:	00 
+  d4:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+  db:	e8 10 04 00 00       	call   4f0 <printf>
       exit();
-  d8:	e8 7b 02 00 00       	call   358 <exit>
+  e0:	e8 73 02 00 00       	call   358 <exit>
 main(void)
 {
   int pid, wpid;
 
   if(open("console", O_RDWR) < 0){
     mknod("console", 1, 1);
-  dd:	c7 44 24 08 01 00 00 	movl   $0x1,0x8(%esp)
-  e4:	00 
-  e5:	c7 44 24 04 01 00 00 	movl   $0x1,0x4(%esp)
+  e5:	c7 44 24 08 01 00 00 	movl   $0x1,0x8(%esp)
   ec:	00 
-  ed:	c7 04 24 fe 07 00 00 	movl   $0x7fe,(%esp)
-  f4:	e8 a7 02 00 00       	call   3a0 <mknod>
+  ed:	c7 44 24 04 01 00 00 	movl   $0x1,0x4(%esp)
+  f4:	00 
+  f5:	c7 04 24 fe 07 00 00 	movl   $0x7fe,(%esp)
+  fc:	e8 9f 02 00 00       	call   3a0 <mknod>
     open("console", O_RDWR);
-  f9:	c7 44 24 04 02 00 00 	movl   $0x2,0x4(%esp)
- 100:	00 
- 101:	c7 04 24 fe 07 00 00 	movl   $0x7fe,(%esp)
- 108:	e8 8b 02 00 00       	call   398 <open>
- 10d:	e9 14 ff ff ff       	jmp    26 <main+0x26>
- 112:	90                   	nop
- 113:	90                   	nop
- 114:	90                   	nop
- 115:	90                   	nop
- 116:	90                   	nop
- 117:	90                   	nop
- 118:	90                   	nop
- 119:	90                   	nop
+ 101:	c7 44 24 04 02 00 00 	movl   $0x2,0x4(%esp)
+ 108:	00 
+ 109:	c7 04 24 fe 07 00 00 	movl   $0x7fe,(%esp)
+ 110:	e8 83 02 00 00       	call   398 <open>
+ 115:	e9 0c ff ff ff       	jmp    26 <main+0x26>
  11a:	90                   	nop
  11b:	90                   	nop
  11c:	90                   	nop
@@ -778,14 +774,11 @@ gets(char *buf, int max)
  420:	b8 1b 00 00 00       	mov    $0x1b,%eax
  425:	cd 30                	int    $0x30
  427:	c3                   	ret    
- 428:	90                   	nop
- 429:	90                   	nop
- 42a:	90                   	nop
- 42b:	90                   	nop
- 42c:	90                   	nop
- 42d:	90                   	nop
- 42e:	90                   	nop
- 42f:	90                   	nop
+
+00000428 <log_init>:
+ 428:	b8 1c 00 00 00       	mov    $0x1c,%eax
+ 42d:	cd 30                	int    $0x30
+ 42f:	c3                   	ret    
 
 00000430 <putc>:
 

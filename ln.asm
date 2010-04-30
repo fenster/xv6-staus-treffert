@@ -709,14 +709,11 @@ gets(char *buf, int max)
  380:	b8 1b 00 00 00       	mov    $0x1b,%eax
  385:	cd 30                	int    $0x30
  387:	c3                   	ret    
- 388:	90                   	nop
- 389:	90                   	nop
- 38a:	90                   	nop
- 38b:	90                   	nop
- 38c:	90                   	nop
- 38d:	90                   	nop
- 38e:	90                   	nop
- 38f:	90                   	nop
+
+00000388 <log_init>:
+ 388:	b8 1c 00 00 00       	mov    $0x1c,%eax
+ 38d:	cd 30                	int    $0x30
+ 38f:	c3                   	ret    
 
 00000390 <putc>:
 

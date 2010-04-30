@@ -15,7 +15,7 @@
 00000000 printf.c
 00000640 putc
 00000670 printint
-00000a4d digits.918
+00000a4d digits.920
 00000000 umalloc.c
 00000a68 freep
 00000a60 base
@@ -23,6 +23,7 @@
 00000700 printf
 00000480 memmove
 00000060 matchhere
+00000638 log_init
 000005b0 mknod
 00000500 gets
 000005e8 getpid

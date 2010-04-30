@@ -4,6 +4,8 @@
 #include "mmu.h"
 #include "proc.h"
 #include "x86.h"
+#include "fcntl.h"
+//#include "logfs.h"
 
 static void bootothers(void);
 static void mpmain(void) __attribute__((noreturn));
@@ -48,9 +50,11 @@ mpmain(void)
   cprintf("cpu%d: mpmain\n", cpu());
   idtinit();
   if(cpu() != mp_bcpu())
-    lapic_init(cpu());
+  lapic_init(cpu());
   setupsegs(0);
   xchg(&cpus[cpu()].booted, 1);
+
+  //log_open(O_RDONLY);
 
   cprintf("cpu%d: scheduling\n", cpu());
   scheduler();

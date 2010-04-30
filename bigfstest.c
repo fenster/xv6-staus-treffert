@@ -9,7 +9,7 @@ int main()
 	
 	struct stat *fstats;
 	int i;
-	int fd = open("BIGFSTEST", O_CREATE | O_RDWR);			//Open test file
+	int fd = open("log", O_CREATE | O_RDWR);			//Open test file
 	printf(2, "Opened test file\n");
 	printf(2, "fd is %d\n", fd);
 
