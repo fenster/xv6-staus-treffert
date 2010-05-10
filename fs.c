@@ -26,7 +26,7 @@
 static void itrunc(struct inode*);
 
 // Read the super block.
-static void
+void
 readsb(int dev, struct superblock *sb)
 {
   struct buf *bp;
@@ -51,7 +51,7 @@ bzero(int dev, int bno)
 // Blocks. 
 
 // Allocate a disk block.
-static uint
+uint
 balloc(uint dev)
 {
   int b, bi, m;
@@ -144,7 +144,7 @@ iinit(void)
 
 // Find the inode with number inum on device dev
 // and return the in-memory copy.
-static struct inode*
+struct inode*
 iget(uint dev, uint inum)
 {
   struct inode *ip, *empty;
@@ -316,7 +316,7 @@ iupdate(struct inode *ip)
 
 // Return the disk block address of the nth block in inode ip.
 // If there is no such block, alloc controls whether one is allocated.
-static uint
+uint
 bmap(struct inode *ip, uint bn, int alloc)
 {
   uint addr, *a;

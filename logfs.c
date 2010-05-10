@@ -1,9 +1,3 @@
-/*
- * logfs.c
- *
- *	Main journaling file -- creates log, writes to log, reads from log on boot.
- *  Created on: Apr 28, 2010
- */
 #include "types.h"
 #include "defs.h"
 #include "param.h"
@@ -17,95 +11,345 @@
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
-#define LOGGED_BLOCKS 10		//number of defined blocks in the log
+struct buf *bp[20];
+uint b_index;
 
-#define CLEAR 0					//log is ready to be written to
-#define LOGGING 1					//log is busy writing data
-#define LOGGED 2				//log is complete, actual write to disk being performed
-
-
-struct inode* log_ip;				//inode pointer to the logfile
-
-struct transhead{
-uint status;
-uint currBlockIndex;
-struct inode *ip;
-uint offset;
-uint size;
+struct trans_start{
+  uint state;
+  uint num_blks;
+  uint sector[20];
 };
 
+#define READY 0
+#define LOGGING 1
+#define LOGGED 2
 
-/**Checks if log exists, if it does not, create one*/
-void log_initialize(){
+static void
+printblock(uchar *p)
+{
+  int i;
 
-	struct inode *ip;
-	//get inode for the log file
-	char *path = "/log";
-	/*
-	if(ip = namei(path) == 0){
-		panic("cannot get inode for log file");
-	}
-	*/
-	ip = namei(path);
-
-	cprintf("ip->inum is %d\n", ip->inum);
-
-	//create buffer as large as the block size
-	char buf[BSIZE];
-	int i;
-	for(i = 0; i < BSIZE; i++){
-		buf[i] = "0";
-	}
-
-	//check if log exists, otherwise create it
-	int lsize = BSIZE*(LOGGED_BLOCKS+1);
-	ilock(ip);
-	if(ip->size != lsize){
-		writei(ip, buf, 0, lsize);
-		cprintf("re-created log file");
-	}
-	iunlock(ip);
-
-	struct transhead t;
-	t.status = CLEAR;
-	t.currBlockIndex = 0;
-	t.offset = 0;
-	t.size = 0;
-	writei(ip, &t, 0, sizeof(struct transhead *));
-
-	log_ip = ip;
-
-	return;
+  for(i=0;i<512;i++){
+    cprintf("%x", p[i]);
+    if(!((i+1)%32)) cprintf("\n");
+  }
 }
 
-/**Write data to the log, than call the real writei
- * ip = inode pointer of file to be written
- * src = buffer to be written
- * off = offset from beginning of file where we should start writing
- * n = size of buffer to be written
- */
+static void
+log_start()
+{
+  struct inode *ip;
+  int i;
+  struct trans_start start;
+  uint state = LOGGING;
+
+  ip = iget(1, 3);
+  ilock(ip);
+  start.state = READY;
+  start.num_blks = b_index;
+  for(i=0;i<b_index;i++){
+    start.sector[i] = bp[i]->sector;
+  }
+
+  writei(ip, &start, 0, sizeof(start));
+
+  for(i=0;i<b_index;i++){
+    writei(ip, bp[i]->data, (i*512) + 512, sizeof(bp[i]->data));
+  }
+
+  writei(ip, &state, 0, sizeof(state));
+
+  iunlock(ip);
+}
+
+static void
+log_end()
+{
+  uint state = LOGGED;
+  struct inode *ip;
+  ip = iget(1, 3);
+  ilock(ip);
+  writei(ip, &state, 0, sizeof(state));
+  iunlock(ip);
+}
+
+void
+log_initialize()
+{
+  struct inode *ip;
+  uchar buffer[512];
+  int i, j;
+  struct buf *bp;
+  struct trans_start t_blk;
+
+  for(j=0;j<512;j++)
+    buffer[j] = 0;
+
+  ip = iget(1, 3);
+  ilock(ip);
+  if(ip->size < 512*20){
+    cprintf("Creating Journal...\n");
+    for(i=0;i<20;i++){
+      writei(ip, buffer, i*512, sizeof(buffer));
+    }
+  }
+  else {
+    readi(ip, &t_blk, 0, sizeof(t_blk));
+
+    if(t_blk.state == LOGGING){
+      cprintf("Inconsistency found in file system. Attempting to recover.\n");
+
+      for(i = 0; i < t_blk.num_blks; i++){
+    	  readi(ip, buffer, i*512+512, sizeof(buffer));
+    	  bp = bread(1, t_blk.sector[i]);
+    	  cprintf("Recovering data in sector: %d\n", t_blk.sector[i]);
+    	  memmove(bp->data, buffer, sizeof(buffer));
+    	  bwrite(bp);
+    	  brelse(bp);
+      }
+
+      writei(ip, buffer, 0, sizeof(buffer));
+      cprintf("Recovery Complete.\n");
+    }
+  }
+
+  iunlock(ip);
+}
+
+
+static uint
+log_balloc(uint dev)
+{
+  int b, bi, m, i;
+  struct superblock sb;
+
+  readsb(dev, &sb);
+  for(b = 0; b < sb.size; b += BPB){
+    for(i = 0; i < b_index; i++)
+      if(bp[i]->sector == BBLOCK(b, sb.ninodes)) {
+	for(bi = 0; bi < BPB; bi++){
+	  m = 1 << (bi % 8);
+	  if((bp[i]->data[bi/8] & m) == 0){
+	    bp[i]->data[bi/8] |= m;
+	    return b + bi;
+	  }
+	}
+      }
+
+    bp[b_index] = bread(dev, BBLOCK(b, sb.ninodes));
+    for(bi = 0; bi < BPB; bi++){
+      m = 1 << (bi % 8);
+      if((bp[b_index]->data[bi/8] & m) == 0){
+	bp[b_index]->data[bi/8] |= m;
+	b_index++;
+	return b + bi;
+      }
+    }
+    brelse(bp[b_index]);
+  }
+  panic("balloc: out of blocks");
+}
+
+uint
+log_lookup(struct inode *ip, uint bn)
+{
+  uchar found = 0;
+  int i;
+  uint addr, *a;
+
+  if(bn < NDIRECT){
+    if((addr = ip->addrs[bn]) == 0){
+      panic("FS failure");
+    }
+    return addr;
+  }
+  bn -= NDIRECT;
+  if(bn < (NINDIRECT * NINDIRECT)){
+    if((addr = ip->addrs[INDIRECT]) == 0){
+      panic("FS failure");
+    }
+    for(i = 0; i < b_index; i++){
+      if(bp[i]->sector == addr){
+	found = 1;
+	a = (uint*)bp[i]->data;
+	if((addr = a[(bn / NINDIRECT)]) == 0){
+	  panic("fs fail");
+	}
+	break;
+      }
+    }
+    if(!found) panic("FS failure");
+    found = 0;
+    for(i = 0;i < b_index; i++){
+      if(bp[i]->sector == addr){
+	found = 1;
+	a = (uint*)bp[i]->data;
+	if((addr = a[(bn % NINDIRECT)]) == 0){
+	  panic("FS failure");
+	}
+	break;
+      }
+    }
+    if(!found)    panic("FS failure");
+
+    return addr;
+  }
+
+  panic("bmap: out of range");
+
+}
+
+uint
+log_bmap(struct inode *ip, uint bn)
+{
+  uchar found;
+  int i;
+  uint addr, *a;
+
+  if(bn < NDIRECT){
+    if((addr = ip->addrs[bn]) == 0){
+      ip->addrs[bn] = addr = log_balloc(ip->dev);
+    }
+    return addr;
+  }
+  bn -= NDIRECT;
+  if(bn < (NINDIRECT * NINDIRECT)){
+
+    // Load double indirect block, allocating if necessary.
+    if((addr = ip->addrs[INDIRECT]) == 0){
+      ip->addrs[INDIRECT] = addr = log_balloc(ip->dev);
+    }
+    // check dirty blocks
+    found = 0;
+    for(i = 0; i < b_index; i++){
+      if(bp[i]->sector == addr){
+	found = 1;
+	a = (uint*)bp[i]->data;
+	if((addr = a[(bn / NINDIRECT)]) == 0){
+	  a[(bn / NINDIRECT)] = addr = log_balloc(ip->dev);
+	}
+	break;
+      }
+    }
+    if(!found){
+      // load new block from mem
+
+      bp[b_index] = bread(ip->dev, addr);
+      a = (uint*)bp[b_index]->data;
+
+      b_index++;
+      if((addr = a[(bn / NINDIRECT)]) == 0){
+	a[(bn / NINDIRECT)] = addr = log_balloc(ip->dev);
+      }
+    }
+    found = 0;
+    for(i = 0;i < b_index; i++){
+      if(bp[i]->sector == addr){
+	found = 1;
+	a = (uint*)bp[i]->data;
+	if((addr = a[(bn % NINDIRECT)]) == 0){
+	  a[(bn % NINDIRECT)] = addr = log_balloc(ip->dev);
+	}
+	break;
+      }
+    }
+    if(!found){
+      // load new block
+      bp[b_index] = bread(ip->dev, addr);
+      a = (uint*)bp[b_index]->data;
+
+      b_index++;
+      if((addr = a[(bn % NINDIRECT)]) == 0){
+	a[(bn % NINDIRECT)] = addr = log_balloc(ip->dev);
+      }
+    }
+
+    return addr;
+  }
+
+  panic("bmap: out of range");
+}
+
+void
+log_iupdate(struct inode *ip)
+{
+  struct dinode *dip;
+  bp[b_index] = bread(ip->dev, IBLOCK(ip->inum));
+  dip = (struct dinode*)bp[b_index]->data + ip->inum%IPB;
+  dip->type = ip->type;
+  dip->major = ip->major;
+  dip->minor = ip->minor;
+  dip->nlink = ip->nlink;
+  dip->size = ip->size;
+  memmove(dip->addrs, ip->addrs, sizeof(ip->addrs));
+  b_index++;
+}
+
 int
 log_writei(struct inode *ip, char *src, uint off, uint n)
 {
-  struct transhead t;
-  t.status = LOGGING;
-  t.ip = ip;
-  t.offset = off;
-  t.size = n;
-  //if it's a huge write, SCREW LOGS (for now)!
-  if(n > BSIZE*LOGGED_BLOCKS){
-	  writei(ip, src, off, n);
+  uint tot, m, i, j;
+  struct buf *tbp;
+
+  if(ip->type == T_DEV){
+    if(ip->major < 0 || ip->major >= NDEV || !devsw[ip->major].write)
+      return -1;
+    return devsw[ip->major].write(ip, src, n);
   }
-  writei(log_ip, &t, 0, sizeof(struct transhead *));		//write status
-  writei(log_ip, *src, BSIZE, n);						//write data to log file
 
-  //data is logged, now time for the write -- BOO YA!
-  t.status = LOGGED;
-  writei(log_ip, &t, 0, sizeof(struct transhead *));
-  writei(ip, src, off, n);
+  if(off + n < off)
+    return -1;
+  if(off + n > MAXFILE*BSIZE)
+    n = MAXFILE*BSIZE - off;
 
-  //writing to the log if finally done, god that took forever
-  t.status = CLEAR;
 
-  return;
+  b_index = 0; // new xfer, start keeping track of open bufs
+
+  /* allocate all space needed */
+  for(i=0, j=off; i<n; i+=m, j+=m){
+    log_bmap(ip, j/BSIZE);
+    m = min(n - i, BSIZE - j%BSIZE);
+  }
+
+  for(tot=0; tot<n; tot+=m, off+=m, src+=m){
+    bp[b_index] = bread(ip->dev, log_lookup(ip, off/BSIZE));
+    m = min(n - tot, BSIZE - off%BSIZE);
+    memmove(bp[b_index]->data + off%BSIZE, src, m);
+    b_index++;
+  }
+
+  if(n > 0 && off > ip->size){
+    ip->size = off;
+    log_iupdate(ip);
+  }
+
+  log_start();
+  for(i = 0; i < b_index; i++){
+    bwrite(bp[i]);
+    brelse(bp[i]);
+  }
+
+  log_end();
+
+  return n;
+
+}
+
+void
+start_trans_man_action()
+{
+  b_index = 0;
+}
+
+void
+end_trans_man_action()
+{
+  int i;
+  log_start();
+  for(i = 0; i < b_index; i++){
+    bwrite(bp[i]);
+    brelse(bp[i]);
+  }
+
+  log_end();
 }

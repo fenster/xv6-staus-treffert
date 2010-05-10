@@ -206,7 +206,7 @@ sys_unlink(void)
   return 0;
 }
 
-static struct inode*
+struct inode*
 create(char *path, int canexist, short type, short major, short minor)
 {
   uint off;

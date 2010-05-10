@@ -32,6 +32,7 @@ int             filestat(struct file*, struct stat*);
 int             filewrite(struct file*, char*, int n);
 
 // fs.c
+uint 			bmap(struct inode*, uint, int);
 int             dirlink(struct inode*, char*, uint);
 struct inode*   dirlookup(struct inode*, char*, uint*);
 struct inode*   ialloc(uint, short);
@@ -48,6 +49,7 @@ struct inode*   nameiparent(char*, char*);
 int             readi(struct inode*, char*, uint, uint);
 void            stati(struct inode*, struct stat*);
 int             writei(struct inode*, char*, uint, uint);
+uint			balloc(uint);
 
 // ide.c
 void            ide_init(void);
@@ -76,7 +78,7 @@ void            lapic_startap(uchar, uint);
 
 //logfs.c
 void			log_initialize();
-int				log_writei(struct inode *ip, char *src, uint off, uint n);
+int				log_writei();
 
 // mp.c
 extern int      ismp;
@@ -138,6 +140,9 @@ int             argstr(int, char**);
 int             fetchint(struct proc*, uint, int*);
 int             fetchstr(struct proc*, uint, char**);
 void            syscall(void);
+
+// sysfile.c
+struct inode*	create(char*, int, short, short, short);
 
 // timer.c
 void            timer_init(void);
